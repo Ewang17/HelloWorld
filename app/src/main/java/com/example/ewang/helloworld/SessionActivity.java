@@ -15,7 +15,7 @@ import com.example.ewang.helloworld.adapter.MsgAdapter;
 import com.example.ewang.helloworld.helper.CustomActivityManager;
 import com.example.ewang.helloworld.model.Constants;
 import com.example.ewang.helloworld.helper.MyApplication;
-import com.example.ewang.helloworld.model.Message;
+import com.example.ewang.helloworld.model.SocketMessage;
 import com.example.ewang.helloworld.model.Msg;
 import com.example.ewang.helloworld.model.User;
 import com.example.ewang.helloworld.service.BaseActivity;
@@ -117,10 +117,10 @@ public class SessionActivity extends BaseActivity {
         startService(showMessagesIntent);
     }
 
-    public static void notifyNewMsg(Message message, int messageType) {
-        if ((message.getUserId() == toUserId && messageType == Msg.TYPE_RECEIVED) ||
-                (message.getUserId() == userId && messageType == Msg.TYPE_SENT)) {
-            msgList.add(new Msg(message.getContent(), messageType));
+    public static void notifyNewMsg(SocketMessage socketMessage, int messageType) {
+        if ((socketMessage.getUserId() == toUserId && messageType == Msg.TYPE_RECEIVED) ||
+                (socketMessage.getUserId() == userId && messageType == Msg.TYPE_SENT)) {
+            msgList.add(new Msg(socketMessage.getContent(), messageType));
             adapter.notifyItemInserted(msgList.size() - 1);
             msgRecyclerView.scrollToPosition(msgList.size() - 1);
         }
@@ -146,11 +146,11 @@ public class SessionActivity extends BaseActivity {
                 .putExtra("toUserId", toUserId);
         startService(sendMessageIntent);
 
-        Message message = new Message(userId, toUserId, content, MyApplication.getCurrentUser().getUsername(), toUsername);
+        SocketMessage socketMessage = new SocketMessage(userId, toUserId, content, toUsername);
 
         //TODO 插入本地数据库/缓存
-        EventBus.getDefault().post(message);
-        notifyNewMsg(message, Msg.TYPE_SENT);
+        EventBus.getDefault().post(socketMessage);
+        notifyNewMsg(socketMessage, Msg.TYPE_SENT);
         editText.setText("");
     }
 

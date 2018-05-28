@@ -14,20 +14,25 @@ public class ResponseWrapper {
 
     private final boolean success;
 
+    private final int status;
+
     private final String errMessage;
 
     private final Map<String, Object> data;
 
     @JsonCreator
     public ResponseWrapper(@JsonProperty("success") boolean success,
-                           @JsonProperty("errMessage") String errMessage,
+                           @JsonProperty("status") int status,
+                           @JsonProperty("message") String errMessage,
                            @JsonProperty("data") Map<String, Object> data) {
         this.success = success;
+        this.status = status;
         this.errMessage = errMessage;
         this.data = data;
     }
 
-    public ResponseWrapper(String errMessage) {
+    public ResponseWrapper(int status, String errMessage) {
+        this.status = status;
         this.success = false;
         this.errMessage = errMessage;
         this.data = new HashMap<>();
@@ -42,6 +47,10 @@ public class ResponseWrapper {
 
     public boolean isSuccess() {
         return success;
+    }
+
+    public int getStatus() {
+        return status;
     }
 
     public String getErrMessage() {

@@ -17,7 +17,7 @@ import com.example.ewang.helloworld.helper.CustomActivityManager;
 import com.example.ewang.helloworld.model.Constants;
 import com.example.ewang.helloworld.helper.JsonHelper;
 import com.example.ewang.helloworld.helper.MyApplication;
-import com.example.ewang.helloworld.model.Message;
+import com.example.ewang.helloworld.model.SocketMessage;
 import com.example.ewang.helloworld.model.Msg;
 
 import org.greenrobot.eventbus.EventBus;
@@ -34,7 +34,7 @@ import java.net.Socket;
  * Created by ewang on 2018/5/8.
  */
 
-public class SocketTask extends AsyncTask<Object, Message, Boolean> {
+public class SocketTask extends AsyncTask<Object, SocketMessage, Boolean> {
 
     private Socket socket;
 
@@ -62,8 +62,8 @@ public class SocketTask extends AsyncTask<Object, Message, Boolean> {
 
             String msgJson;
             while ((msgJson = readFromServer()) != null) {
-                Message message = JsonHelper.decode(msgJson, Message.class);
-                publishProgress(message);
+                SocketMessage socketMessage = JsonHelper.decode(msgJson, SocketMessage.class);
+                publishProgress(socketMessage);
             }
 
             if (EventBus.getDefault().isRegistered(this)) {
@@ -77,10 +77,10 @@ public class SocketTask extends AsyncTask<Object, Message, Boolean> {
     }
 
     @Override
-    protected void onProgressUpdate(Message... values) {
+    protected void onProgressUpdate(SocketMessage... values) {
         super.onProgressUpdate(values);
         //TODO 插入本地数据库/缓存
-        Message m = values[0];
+        SocketMessage m = values[0];
         if (!CustomActivityManager.getInstance().isAppForeground()) {
             openNotification(MyApplication.getContext(), m.getUserId(), m.getUsername(), m.getContent());
             return;
@@ -133,7 +133,7 @@ public class SocketTask extends AsyncTask<Object, Message, Boolean> {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void onSendMsgEvent(Message m) {
+    public void onSendMsgEvent(SocketMessage m) {
         String msgJson = JsonHelper.encode(m);
         try {
             outputStream.write((msgJson + "\n").getBytes(Constants.CharsetName.getValue()));

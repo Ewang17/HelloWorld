@@ -23,16 +23,10 @@ import java.util.Map;
 
 public class SessionAdapter extends RecyclerView.Adapter<SessionAdapter.ViewHolder> {
 
-    private List<User> userList;
+    private List<Session> sessionList;
 
-    private Map<Long, String> latestMessageMap;
-
-    private Map<Long, Session> sessionMap;
-
-    public SessionAdapter(List<User> userList, Map<Long, String> latestMessageMap, Map<Long, Session> sessionMap) {
-        this.userList = userList;
-        this.latestMessageMap = latestMessageMap;
-        this.sessionMap = sessionMap;
+    public SessionAdapter(List<Session> sessionList) {
+        this.sessionList = sessionList;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -63,7 +57,7 @@ public class SessionAdapter extends RecyclerView.Adapter<SessionAdapter.ViewHold
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), SessionActivity.class);
                 int position = viewHolder.getAdapterPosition();
-                User user = userList.get(position);
+                User user = sessionList.get(position).getToUser();
                 intent.putExtra("toUserId", user.getId());
                 intent.putExtra("toUsername", user.getUsername());
                 v.getContext().startActivity(intent);
@@ -74,11 +68,11 @@ public class SessionAdapter extends RecyclerView.Adapter<SessionAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        User user = userList.get(position);
+        Session session = sessionList.get(position);
+        User user = session.getToUser();
         holder.textUsername.setText(user.getUsername());
 
-        String messageContent = latestMessageMap.get(user.getId());
-        Session session = sessionMap.get(user.getId());
+        String messageContent = session.getLatestMessage();
         if (messageContent != null && !messageContent.isEmpty()) {
             if (messageContent.length() > 20) {
                 messageContent = messageContent.substring(0, 20) + "...";
@@ -112,6 +106,6 @@ public class SessionAdapter extends RecyclerView.Adapter<SessionAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return userList.size();
+        return sessionList.size();
     }
 }

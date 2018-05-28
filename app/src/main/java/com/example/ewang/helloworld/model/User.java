@@ -14,23 +14,19 @@ public class User {
 
     private final String account;
 
-    private final String password;
+    private final Image image;
 
     private final String username;
-
-    private final Date createTime;
 
     @JsonCreator
     public User(@JsonProperty("id") long id,
                 @JsonProperty("account") String account,
-                @JsonProperty("password") String password,
                 @JsonProperty("username") String username,
-                @JsonProperty("createTime") long createTime) {
+                @JsonProperty("image") Image image) {
         this.id = id;
         this.account = account;
-        this.password = password;
+        this.image = image;
         this.username = username;
-        this.createTime = new Date(createTime);
     }
 
     public long getId() {
@@ -41,15 +37,11 @@ public class User {
         return account;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getUsername() {
-        return username;
+        return username == null ? "Customer" : username;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Image getImage() {
+        return image;
     }
 }

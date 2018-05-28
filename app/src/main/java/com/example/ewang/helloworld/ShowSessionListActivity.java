@@ -28,11 +28,7 @@ public class ShowSessionListActivity extends BaseActivity {
 
     private static SessionAdapter adapter;
 
-    private static List<User> userList;
-
-    private static Map<Long, String> messageMap;
-
-    private static Map<Long, Session> sessionMap;
+    private static List<Session> sessionList;
 
     private User user = MyApplication.getCurrentUser();
 
@@ -91,19 +87,20 @@ public class ShowSessionListActivity extends BaseActivity {
 
     }
 
-    public static void setAdapter(List<User> users, Map<Long, String> latestMessageMap, Map<Long, Session> mSessionMap) {
-        userList = users;
-        messageMap = latestMessageMap;
-        sessionMap = mSessionMap;
-        adapter = new SessionAdapter(userList, messageMap, sessionMap);
+    public static void setAdapter(List<Session> sessions) {
+        sessionList = sessions;
+        adapter = new SessionAdapter(sessionList);
         friendRecyclerView.setAdapter(adapter);
     }
 
     public static void notifyNewMsg(Long userId, String msgContent) {
-        Session oldSession = sessionMap.get(userId);
-        sessionMap.put(userId, new Session(oldSession.getId(), oldSession.getUserId(), oldSession.getToUserId(),
-                oldSession.getCreateTime().getTime(), oldSession.getUpdateTime().getTime(), oldSession.getUnread() + 1));
-        messageMap.put(userId, msgContent);
+        for (Session s : sessionList) {
+            if (s.getToUser().getId() == userId) {
+                s.setUnread(s.getUnread() + 1);
+                s.setLatestMessage(msgContent);
+                break;
+            }
+        }
         adapter.notifyDataSetChanged();
     }
 }

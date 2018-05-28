@@ -10,47 +10,33 @@ import java.util.Date;
  */
 
 public class Session {
-    private final long id;
 
-    private final long userId;
+    private final User toUser;
 
-    private final long toUserId;
-
-    private final Date createTime;
+    private String latestMessage;
 
     private final Date updateTime;
 
-    private final int unread;
+    private int unread;
+
 
     @JsonCreator
-    public Session(@JsonProperty("id") long id,
-                   @JsonProperty("userId") long userId,
-                   @JsonProperty("toUserId") long toUserId,
-                   @JsonProperty("createTime") long createTime,
+    public Session(@JsonProperty("toUser") User toUser,
+                   @JsonProperty("latestMessage") String latestMessage,
                    @JsonProperty("updateTime") long updateTime,
                    @JsonProperty("unread") int unread) {
-        this.id = id;
-        this.userId = userId;
-        this.toUserId = toUserId;
-        this.createTime = new Date(createTime);
+        this.toUser = toUser;
+        this.latestMessage = latestMessage;
         this.updateTime = new Date(updateTime);
         this.unread = unread;
     }
 
-    public long getId() {
-        return id;
+    public User getToUser() {
+        return toUser;
     }
 
-    public long getUserId() {
-        return userId;
-    }
-
-    public long getToUserId() {
-        return toUserId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
+    public String getLatestMessage() {
+        return latestMessage;
     }
 
     public Date getUpdateTime() {
@@ -59,5 +45,13 @@ public class Session {
 
     public int getUnread() {
         return unread;
+    }
+
+    public void setUnread(int unread) {
+        this.unread = unread;
+    }
+
+    public void setLatestMessage(String latestMessage) {
+        this.latestMessage = latestMessage;
     }
 }

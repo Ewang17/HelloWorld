@@ -30,16 +30,10 @@ public class ShowFriendsService extends Service {
         @Override
         public void onSuccess(ResponseWrapper responseWrapper) {
             Map<String, Object> dataMap = responseWrapper.getData();
-            List<User> userList = JsonHelper.decode(
-                    JsonHelper.encode(dataMap.get("userList")), new TypeReference<List<User>>() {
+            List<Session> sessionList = JsonHelper.decode(
+                    JsonHelper.encode(dataMap.get("sessionList")), new TypeReference<List<Session>>() {
                     });
-            Map<Long, String> messageMap = JsonHelper.decode(
-                    JsonHelper.encode(dataMap.get("messageMap")), new TypeReference<Map<Long, String>>() {
-                    });
-            Map<Long, Session> sessionMap = JsonHelper.decode(
-                    JsonHelper.encode(dataMap.get("sessionMap")), new TypeReference<Map<Long, Session>>() {
-                    });
-            ShowSessionListActivity.setAdapter(userList, messageMap, sessionMap);
+            ShowSessionListActivity.setAdapter(sessionList);
         }
     };
 

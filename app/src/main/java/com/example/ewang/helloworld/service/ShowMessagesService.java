@@ -29,14 +29,15 @@ public class ShowMessagesService extends Service {
         @Override
         public void onSuccess(ResponseWrapper responseWrapper) {
             Map<String, Object> dataMap = responseWrapper.getData();
-            List<Message> messageList = JsonHelper.decode(JsonHelper.encode(dataMap.get("messageList")), new TypeReference<List<Message>>() {
-            });
+            List<Message> messageList = JsonHelper.decode(JsonHelper.encode(dataMap.get("messageList")),
+                    new TypeReference<List<Message>>() {
+                    });
             List<Msg> msgList = new ArrayList<>();
             User user = MyApplication.getCurrentUser();
             for (Message m : messageList) {
-                if (m.getUserId() == user.getId()) {
+                if (m.getUser().getId() == user.getId()) {
                     msgList.add(new Msg(m.getContent(), Msg.TYPE_SENT));
-                } else if (m.getToUserId() == user.getId()) {
+                } else if (m.getToUser().getId() == user.getId()) {
                     msgList.add(new Msg(m.getContent(), Msg.TYPE_RECEIVED));
                 }
             }

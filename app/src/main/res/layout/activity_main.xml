@@ -11,7 +11,7 @@
         android:layout_above="@id/relative_layout_bottom"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="100dp"
-        android:text="Welcome To Chat"
+        android:text="Welcome To The World"
         android:textSize="18sp"
         android:textStyle="bold" />
 

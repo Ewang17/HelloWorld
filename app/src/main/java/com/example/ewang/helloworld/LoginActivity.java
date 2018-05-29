@@ -25,6 +25,7 @@ public class LoginActivity extends BaseActivity {
 
     Button btnSure;
 
+    public static int requestType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class LoginActivity extends BaseActivity {
         editPwd = findViewById(R.id.edit_pwd);
 
         Intent intent = getIntent();
-        int requestType = intent.getIntExtra("request", 0);
+        requestType = intent.getIntExtra("request", 0);
 
         String requestUri = "/user/login";
         if (requestType == MainActivity.request_reg) {

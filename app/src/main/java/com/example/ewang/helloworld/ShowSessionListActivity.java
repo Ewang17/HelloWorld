@@ -15,10 +15,9 @@ import com.example.ewang.helloworld.model.Session;
 import com.example.ewang.helloworld.model.User;
 import com.example.ewang.helloworld.service.BaseActivity;
 import com.example.ewang.helloworld.service.LoginService;
-import com.example.ewang.helloworld.service.ShowFriendsService;
+import com.example.ewang.helloworld.service.ShowSessionListService;
 
 import java.util.List;
-import java.util.Map;
 
 public class ShowSessionListActivity extends BaseActivity {
 
@@ -35,7 +34,7 @@ public class ShowSessionListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_friends);
+        setContentView(R.layout.activity_show_session_list);
 
         btnOff = findViewById(R.id.btn_off);
         friendRecyclerView = findViewById(R.id.friend_recycler_view);
@@ -80,7 +79,7 @@ public class ShowSessionListActivity extends BaseActivity {
     }
 
     void setMessageAdapter(User user) {
-        Intent showFriendsIntent = new Intent(ShowSessionListActivity.this, ShowFriendsService.class)
+        Intent showFriendsIntent = new Intent(ShowSessionListActivity.this, ShowSessionListService.class)
                 .putExtra("url", Constants.DefaultBasicUrl.getValue() + "/session/find")
                 .putExtra("userId", user.getId());
         startService(showFriendsIntent);

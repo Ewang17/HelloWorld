@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/grey"
+    android:layout_alignParentBottom="true"
+    android:id="@+id/nav_bar">
+
+
+    <ImageView
+        android:id="@+id/nav_shop"
+        android:layout_height="50dp"
+        android:layout_width="50dp"
+        android:src="@drawable/nav_unchoose"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        />
+
+    <ImageView
+        android:id="@+id/nav_world"
+        android:layout_height="50dp"
+        android:layout_width="50dp"
+        android:src="@drawable/nav_unchoose"
+        android:layout_centerVertical="true"
+        android:layout_marginHorizontal="30dp"
+        android:layout_toRightOf="@id/nav_shop"
+        />
+
+
+    <ImageView
+        android:id="@+id/nav_draw"
+        android:layout_height="60dp"
+        android:layout_width="60dp"
+        android:background="@drawable/apple_pic"
+        android:layout_centerInParent="true" />
+
+
+    <ImageView
+        android:id="@+id/nav_session"
+        android:layout_height="50dp"
+        android:layout_width="50dp"
+        android:src="@drawable/nav_unchoose"
+        android:layout_centerVertical="true"
+        android:layout_marginHorizontal="30dp"
+        android:layout_toLeftOf="@id/nav_self"
+        />
+
+    <ImageView
+        android:id="@+id/nav_self"
+        android:layout_height="50dp"
+        android:layout_width="50dp"
+        android:src="@drawable/nav_unchoose"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        />
+
+
+</RelativeLayout>

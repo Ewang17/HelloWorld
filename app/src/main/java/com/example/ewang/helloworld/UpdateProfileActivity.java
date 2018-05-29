@@ -152,7 +152,7 @@ public class UpdateProfileActivity extends BaseActivity {
     private void displayImage(String imagePath) {
         if (imagePath != null) {
             Intent uploadIntent = new Intent(UpdateProfileActivity.this, UploadImageService.class)
-                    .putExtra("url", Constants.DefaultBasicUrl.getValue() + "/user/upload/avatar")
+                    .putExtra("url", Constants.DefaultBasicUrl.getValue() + "/upload/image")
                     .putExtra("imagePath", imagePath);
             startService(uploadIntent);
 

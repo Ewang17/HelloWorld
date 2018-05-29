@@ -31,7 +31,7 @@
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".service.ShowFriendsService"
+            android:name=".service.ShowSessionListService"
             android:enabled="true"
             android:exported="true" />
         <service
@@ -46,11 +46,14 @@
             android:name=".service.ClearUnreadService"
             android:enabled="true"
             android:exported="true" />
-
         <service
             android:name=".service.UploadImageService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".ShopActivity" />
+        <activity android:name=".WorldActivity" />
+        <activity android:name=".SelfActivity"></activity>
     </application>
 
 </manifest>

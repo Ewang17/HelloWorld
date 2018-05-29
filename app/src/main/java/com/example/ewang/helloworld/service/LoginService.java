@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
 
+import com.example.ewang.helloworld.ShopActivity;
+import com.example.ewang.helloworld.LoginActivity;
+import com.example.ewang.helloworld.MainActivity;
 import com.example.ewang.helloworld.UpdateProfileActivity;
 import com.example.ewang.helloworld.helper.CustomActivityManager;
 import com.example.ewang.helloworld.helper.DialogHelper;
@@ -40,7 +43,8 @@ public class LoginService extends Service {
 
             progressDialog.dismiss();
             CustomActivityManager.getInstance().getCurrentActivity().finish();
-            Intent intent = new Intent(CustomActivityManager.getInstance().getCurrentActivity(), UpdateProfileActivity.class);
+            Intent intent = new Intent(CustomActivityManager.getInstance().getCurrentActivity(),
+                    LoginActivity.requestType == MainActivity.request_reg ? UpdateProfileActivity.class : ShopActivity.class);
             startActivity(intent);
         }
 

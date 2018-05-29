@@ -24,7 +24,7 @@ import okhttp3.RequestBody;
  * Created by ewang on 2018/5/7.
  */
 
-public class ShowFriendsService extends Service {
+public class ShowSessionListService extends Service {
 
     ResponseListener responseListener = new ResponseListener() {
         @Override

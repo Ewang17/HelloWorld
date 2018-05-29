@@ -9,8 +9,8 @@ import com.example.ewang.helloworld.service.BaseActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-    static final int request_login = 0;
-    static final int request_reg = 1;
+    public static final int request_login = 0;
+    public static final int request_reg = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -9,7 +9,7 @@ import java.util.Map;
  */
 
 public enum Constants {
-    ServerIP("10.151.38.74"),
+    ServerIP("10.150.4.125"),
     CharsetName("utf-8"),
     DefaultBasicUrl("http://" + ServerIP.getValue() + ":8080");
 

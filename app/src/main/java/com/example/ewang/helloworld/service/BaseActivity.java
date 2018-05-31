@@ -6,17 +6,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.example.ewang.helloworld.DrawEntranceActivity;
 import com.example.ewang.helloworld.SelfActivity;
 import com.example.ewang.helloworld.ShopActivity;
 import com.example.ewang.helloworld.R;
 import com.example.ewang.helloworld.ShowSessionListActivity;
 import com.example.ewang.helloworld.WorldActivity;
 import com.example.ewang.helloworld.helper.CustomActivityManager;
+import com.example.ewang.helloworld.helper.MyApplication;
 
 /**
  * Created by ewang on 2018/5/14.
@@ -34,7 +37,12 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(this.getLocalClassName(), "onCreate");
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        if (MyApplication.getScreenHeight() == 0 || MyApplication.getCanvasWidth() == 0) {
+            MyApplication.setScreenWidth(displayMetrics.widthPixels);
+            MyApplication.setScreenHeight(displayMetrics.heightPixels);
+        }
+        Log.i(this.getLocalClassName(), "onCreate, 屏幕————" + "宽度:" + MyApplication.getScreenWidth() + ",高度:" + MyApplication.getScreenHeight());
     }
 
     @Override
@@ -139,6 +147,12 @@ public class BaseActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        //TODO 绘制页面
+        imageDraw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CustomActivityManager.getInstance().getCurrentActivity(), DrawEntranceActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

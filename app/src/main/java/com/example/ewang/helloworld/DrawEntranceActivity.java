@@ -22,6 +22,8 @@ public class DrawEntranceActivity extends BaseActivity implements View.OnClickLi
         drawLeft = findViewById(R.id.draw_left);
         drawBack = findViewById(R.id.draw_back);
         drawRight = findViewById(R.id.draw_right);
+
+        drawFront.setOnClickListener(this);
     }
 
 
@@ -30,7 +32,7 @@ public class DrawEntranceActivity extends BaseActivity implements View.OnClickLi
         Intent intent;
         switch (v.getId()) {
             case R.id.draw_front:
-                intent = new Intent(this, DrawFrontActivity.class);
+                intent = new Intent(DrawEntranceActivity.this, DrawFrontActivity.class);
                 startActivity(intent);
                 break;
             default:

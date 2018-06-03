@@ -7,5 +7,5 @@ package com.example.ewang.helloworld.view;
 public interface OperationListener {
     void onDeleteClick();
 
-    void onEdit(CanvasView canvasView);
+    void onEdit(BaseCanvasView canvasView);
 }

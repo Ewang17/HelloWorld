@@ -16,103 +16,66 @@ import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.RectHelper;
 
 /**
- * Created by ewang on 2018/5/29.
+ * Created by ewang on 2018/6/1.
  */
 
-public class CanvasView extends View {
+public class BaseCanvasView extends View {
+    protected Bitmap deleteIcon;
 
-    private Bitmap mainBitmap;
+    protected Bitmap resizeIcon;
 
-    private Bitmap deleteIcon;
+    protected Bitmap reeditIcon;
 
-    private Bitmap resizeIcon;
+    protected int canvasWidth, canvasHeight;
 
-    private int canvasWidth, canvasHeight;
+    protected int bitmapWidth, bitmapHeight;
 
-    private int bitmapWidth, bitmapHeight;
+    protected int deleteIconWidth, deleteIconHeight;
 
-    private int deleteIconWidth, deleteIconHeight;
+    protected int resizeIconWidth, resizeIconHeight;
 
-    private int resizeIconWidth, resizeIconHeight;
+    protected int reeditIconWidth, reeditIconHeight;
 
     public Rect rect_delete;
 
     public Rect rect_resize;
 
-    private Paint strokePaint;
+    public Rect rect_reedit;
 
-    private float MIN_SCALE = 0.5f;
+    protected Paint strokePaint;
 
-    private float MAX_SCALE = 1.2f;
+    protected float MIN_SCALE = 0.5f;
 
-    private static final float ICON_SCALE = 0.7f;
+    protected float MAX_SCALE = 1.2f;
 
-    private boolean inEdit = true;
+    protected boolean inEdit = true;
 
-    private boolean inResize;
+    protected boolean inResize;
 
-    private boolean inBitmap;
+    protected boolean inBitmap;
+
+    protected static final float ICON_SCALE = 0.7f;
 
     //记录每次移动的横、纵坐标
-    private float lastX, lastY;
+    protected float lastX, lastY;
 
     //触摸的位置和图片左上角位置的中点
-    private PointF mid = new PointF();
+    protected PointF mid = new PointF();
 
     //记录每次旋转的角度
-    private float lastRotateDegree;
+    protected float lastRotateDegree;
 
     //记录每次缩放的大小
-    private float lastlengthFromTouchToMid;
+    protected float lastlengthFromTouchToMid;
 
-    //原图片对角线长度的一半
-    private double halfDiagonalLength;
+    protected OperationListener operationListener;
 
-    private OperationListener operationListener;
+    protected Matrix matrix = new Matrix();
 
-    private Matrix matrix = new Matrix();
-
-    public Matrix getMatrixInstance() {
-        return matrix;
-    }
-
-    public CanvasView(Context context, Bitmap bitmap) {
+    public BaseCanvasView(Context context) {
         super(context);
-        mainBitmap = bitmap;
-
-        matrix.reset();
-
-        halfDiagonalLength = Math.hypot(mainBitmap.getWidth(), mainBitmap.getHeight()) / 2;
-
         canvasWidth = MyApplication.getCanvasWidth();
         canvasHeight = MyApplication.getCanvasHeight();
-
-        bitmapWidth = bitmap.getWidth();
-        bitmapHeight = bitmap.getHeight();
-
-        initIcons();
-        initPaint();
-        initScale(bitmap);
-
-        float initScale = (MIN_SCALE + MAX_SCALE) / 2;
-        matrix.postScale(initScale, initScale, bitmapWidth / 2, bitmapHeight / 2);
-        matrix.postTranslate(canvasWidth / 2 - bitmapWidth / 2, canvasHeight / 2 - bitmapHeight / 2);
-        invalidate();
-
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        if (mainBitmap == null) {
-            return;
-        }
-        canvas.save();
-        canvas.drawBitmap(mainBitmap, matrix, null);
-
-        drawIconsSize(canvas);
-        canvas.restore();
-
     }
 
     @Override
@@ -132,6 +95,8 @@ public class CanvasView extends View {
                     lastRotateDegree = rotationDegreeToLeftTop(event);
                     setMidPointFromTouchToLeftTop(event);
                     lastlengthFromTouchToMid = lengthFromTouchToMid(event);
+                } else if (isInOperate(event, rect_reedit)) {
+
                 } else if (isInBitmap(event)) {
                     inBitmap = true;
                     lastX = event.getX(0);
@@ -166,6 +131,18 @@ public class CanvasView extends View {
 
         }
         return handled;
+    }
+
+    public Matrix getMatrixInstance() {
+        return matrix;
+    }
+
+    public boolean isInEdit() {
+        return inEdit;
+    }
+
+    public void setOperationListener(OperationListener operationListener) {
+        this.operationListener = operationListener;
     }
 
     void initScale(Bitmap bitmap) {
@@ -203,6 +180,7 @@ public class CanvasView extends View {
     void initIcons() {
         deleteIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_delete);
         resizeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_resize);
+        reeditIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_reedit);
 
         deleteIconWidth = (int) (deleteIcon.getWidth() * ICON_SCALE);
         deleteIconHeight = (int) (deleteIcon.getHeight() * ICON_SCALE);
@@ -210,8 +188,12 @@ public class CanvasView extends View {
         resizeIconWidth = (int) (resizeIcon.getWidth() * ICON_SCALE);
         resizeIconHeight = (int) (resizeIcon.getHeight() * ICON_SCALE);
 
+        reeditIconWidth = (int) (reeditIcon.getWidth() * ICON_SCALE);
+        reeditIconWidth = (int) (reeditIcon.getHeight() * ICON_SCALE);
+
         rect_delete = new Rect();
         rect_resize = new Rect();
+        rect_reedit = new Rect();
     }
 
     void initPaint() {
@@ -242,6 +224,12 @@ public class CanvasView extends View {
         rect_resize.top = (int) (rightBottom.y - resizeIconHeight / 2);
         rect_resize.bottom = (int) (rightBottom.y + resizeIconHeight / 2);
 
+        //编辑在左上角
+        rect_reedit.left = (int) (leftTop.x - reeditIconWidth / 2);
+        rect_reedit.right = (int) (leftTop.x + reeditIconWidth / 2);
+        rect_reedit.top = (int) (leftTop.y - reeditIconHeight / 2);
+        rect_reedit.bottom = (int) (leftTop.y + reeditIconHeight / 2);
+
         if (inEdit) {
             canvas.drawLine(leftTop.x, leftTop.y, rightTop.x, rightTop.y, strokePaint);
             canvas.drawLine(rightTop.x, rightTop.y, rightBottom.x, rightBottom.y, strokePaint);
@@ -250,20 +238,13 @@ public class CanvasView extends View {
 
             canvas.drawBitmap(deleteIcon, null, rect_delete, null);
             canvas.drawBitmap(resizeIcon, null, rect_resize, null);
+            canvas.drawBitmap(reeditIcon, null, rect_reedit, null);
         }
     }
 
     public void setInEdit(boolean inEdit) {
         this.inEdit = inEdit;
         invalidate();
-    }
-
-    public boolean isInEdit() {
-        return inEdit;
-    }
-
-    public void setOperationListener(OperationListener operationListener) {
-        this.operationListener = operationListener;
     }
 
     /**
@@ -330,5 +311,6 @@ public class CanvasView extends View {
         int bottom = rect.bottom + (rect == rect_resize ? -20 : 0);
         return event.getX(0) >= left && event.getX(0) <= right && event.getY(0) >= top && event.getY(0) <= bottom;
     }
+
 
 }

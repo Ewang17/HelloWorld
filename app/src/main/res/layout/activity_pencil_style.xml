@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/colorPrimary">
+
+        <ImageView
+            android:id="@+id/popbtn_cancel"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:clickable="true"
+            android:src="@drawable/ic_common_close_white_bounding"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="15%" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:text="画笔样式"
+            android:textSize="20dp" />
+
+        <ImageView
+            android:id="@+id/popbtn_sure"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:clickable="true"
+            android:src="@drawable/ic_common_done_white_bounding"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="15%" />
+
+    </android.support.percent.PercentRelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_weight="3"
+        android:background="@color/white">
+
+    </FrameLayout>
+
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6"
+        android:background="@color/colorPrimary"
+        android:scrollbars="vertical">
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/relative_layout1"
+            android:layout_marginTop="20dp"
+            app:layout_heightPercent="30%"
+            app:layout_widthPercent="100%">
+
+            <SeekBar
+                android:id="@+id/size_seekbar"
+                android:paddingLeft="20dp"
+                android:progress="10"
+                app:layout_heightPercent="50%"
+                app:layout_widthPercent="70%" />
+
+            <TextView
+                android:id="@+id/text_size"
+                android:layout_below="@+id/size_seekbar"
+                android:paddingLeft="20dp"
+                android:text="尺寸：10"
+                android:textSize="18dp"
+                app:layout_heightPercent="50%"
+                app:layout_widthPercent="70%" />
+
+            <ImageView
+                android:id="@+id/minus"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/plus"
+                android:layout_toStartOf="@+id/plus"
+                android:src="@drawable/ic_color_picker_minus"
+                app:layout_heightPercent="50%"
+                app:layout_widthPercent="15%" />
+
+            <ImageView
+                android:id="@+id/plus"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_color_picker_plus"
+                app:layout_heightPercent="50%"
+                app:layout_widthPercent="15%" />
+
+        </android.support.percent.PercentRelativeLayout>
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/relative_layout2"
+            android:layout_below="@+id/relative_layout1"
+            android:layout_marginTop="20dp"
+            app:layout_heightPercent="30%"
+            app:layout_widthPercent="100%">
+
+            <SeekBar
+                android:id="@+id/size_seekbar2"
+                android:paddingLeft="20dp"
+                android:progress="100"
+                app:layout_heightPercent="50%"
+                app:layout_widthPercent="70%" />
+
+            <TextView
+                android:id="@+id/text_alpha"
+                android:layout_below="@+id/size_seekbar2"
+                android:paddingLeft="20dp"
+                android:text="透明度：100%"
+                android:textSize="18dp"
+                app:layout_heightPercent="50%"
+                app:layout_widthPercent="70%" />
+
+
+            <ImageView
+                android:id="@+id/minus2"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/plus2"
+                android:layout_toStartOf="@+id/plus2"
+                android:src="@drawable/ic_color_picker_minus"
+                app:layout_heightPercent="50%"
+                app:layout_widthPercent="15%" />
+
+            <ImageView
+                android:id="@+id/plus2"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_color_picker_plus"
+                app:layout_heightPercent="50%"
+                app:layout_widthPercent="15%" />
+
+        </android.support.percent.PercentRelativeLayout>
+
+        <Button
+            android:id="@+id/reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relative_layout2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:text="重置" />
+
+
+    </android.support.percent.PercentRelativeLayout>
+
+</LinearLayout>

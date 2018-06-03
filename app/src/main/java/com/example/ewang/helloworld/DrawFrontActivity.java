@@ -1,5 +1,7 @@
 package com.example.ewang.helloworld;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.Intent;
@@ -11,41 +13,77 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.percent.PercentRelativeLayout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
+import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.example.ewang.helloworld.helper.MyApplication;
+import com.example.ewang.helloworld.helper.PopWindowHelper;
 import com.example.ewang.helloworld.service.BaseActivity;
-import com.example.ewang.helloworld.view.CanvasView;
+import com.example.ewang.helloworld.view.BaseCanvasView;
+import com.example.ewang.helloworld.view.PencilView;
+import com.example.ewang.helloworld.view.PhotoView;
 import com.example.ewang.helloworld.view.OperationListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class DrawFrontActivity extends BaseActivity implements View.OnClickListener {
 
     FrameLayout canvasLayout;
-    List<View> viewList = new ArrayList<>();
-    private CanvasView topView;
+    PercentRelativeLayout topDrawLayout;
+    private BaseCanvasView topView;
+
+    private PencilView currentDrawView;
+
+    private PopWindowHelper popWindowHelper;
+
+    PercentRelativeLayout basicDrawBar;
+    PercentRelativeLayout pencilDrawBar;
 
     public static final int CHOOSE_PHOTO = 2;
 
+    final int IN_LARGE = 0;
+    final int IN_NORMAL = 1;
+    int scaleStatus = IN_NORMAL;
+    private float scaleX, scaleY;
+
     ImageView addPhoto;
+    ImageView addPencil;
+
+    ImageView pencil;
+    ImageView eraser;
+    ImageView cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draw_front);
         canvasLayout = findViewById(R.id.layout_view_canvas);
+        topDrawLayout = findViewById(R.id.layout_top_draw_area);
         setCanvasSize();
+
+        basicDrawBar = findViewById(R.id.layout_basic_bar);
+        pencilDrawBar = findViewById(R.id.layout_pencil_bar);
+
+        pencil = findViewById(R.id.image_draw_pencil);
+        eraser = findViewById(R.id.image_draw_eraser);
+        cancel = findViewById(R.id.image_draw_cancel);
+
         addPhoto = findViewById(R.id.image_menu_add_photo);
+        addPencil = findViewById(R.id.image_menu_pencil);
+
         addPhoto.setOnClickListener(this);
+        addPencil.setOnClickListener(this);
+        pencil.setOnClickListener(this);
+        eraser.setOnClickListener(this);
+        cancel.setOnClickListener(this);
 
     }
 
@@ -57,11 +95,130 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 picIntent.setType("image/*");
                 startActivityForResult(picIntent, CHOOSE_PHOTO);
                 break;
+            case R.id.image_menu_pencil:
+                doDraw();
+                currentDrawView = new PencilView(this);
+                popWindowHelper = new PopWindowHelper(currentDrawView);
+                canvasLayout.addView(currentDrawView);
+                basicDrawBar.setVisibility(View.INVISIBLE);
+                pencilDrawBar.setVisibility(View.VISIBLE);
+                pencil.setColorFilter(R.color.pink);
+                break;
+            case R.id.image_draw_pencil:
+                pencil.setColorFilter(R.color.pink);
+                eraser.setColorFilter(null);
+                if (currentDrawView.getCurrentPencilStatus() == PencilView.IN_PENCIL) {
+                    WindowManager.LayoutParams lp = getWindow().getAttributes();
+                    lp.alpha = 0.5f;
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    getWindow().setAttributes(lp);
+                    popWindowHelper.showPencilStyle(this, v, new PopupWindow.OnDismissListener() {
+                        @Override
+                        public void onDismiss() {
+                            WindowManager.LayoutParams lp = getWindow().getAttributes();
+                            lp.alpha = 1.0f;
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                            getWindow().setAttributes(lp);
+                        }
+                    });
+                } else {
+                    currentDrawView.setPencilStyle(false, PencilView.IN_PENCIL,
+                            currentDrawView.getCurrentPencilSize(), currentDrawView.getCurrentPencilAlpha());
+                    currentDrawView.setCurrentPencilStatus(PencilView.IN_PENCIL);
+                }
+                break;
+            case R.id.image_draw_eraser:
+                eraser.setColorFilter(R.color.pink);
+                pencil.setColorFilter(null);
+                if (currentDrawView.getCurrentPencilStatus() == PencilView.IN_ERASER) {
+                    WindowManager.LayoutParams lp = getWindow().getAttributes();
+                    lp.alpha = 0.5f;
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    getWindow().setAttributes(lp);
+                    popWindowHelper.showPencilStyle(this, v, new PopupWindow.OnDismissListener() {
+                        @Override
+                        public void onDismiss() {
+                            WindowManager.LayoutParams lp = getWindow().getAttributes();
+                            lp.alpha = 1.0f;
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                            getWindow().setAttributes(lp);
+                        }
+                    });
+                } else {
+                    currentDrawView.setPencilStyle(false, PencilView.IN_ERASER,
+                            currentDrawView.getCurrentEraserSize(), 0);
+                    currentDrawView.setCurrentPencilStatus(PencilView.IN_ERASER);
+                }
+                break;
+            case R.id.image_draw_cancel:
+                doDraw();
+                canvasLayout.removeView(currentDrawView);
+                pencilDrawBar.setVisibility(View.INVISIBLE);
+                basicDrawBar.setVisibility(View.VISIBLE);
             default:
                 break;
         }
     }
 
+    void doDraw() {
+        AnimatorSet animatorSet = new AnimatorSet();
+        float startX, startY;
+        if (scaleStatus == IN_NORMAL) {
+            startX = 1.0f;
+            startY = 1.0f;
+            scaleX = MyApplication.getScreenWidth() * 0.9f / (float) MyApplication.getCanvasWidth();
+            scaleY = MyApplication.getScreenHeight() * 0.8f / (float) MyApplication.getCanvasHeight();
+
+            MyApplication.setCanvasWidth((int) (MyApplication.getCanvasWidth() * scaleX));
+            MyApplication.setCanvasHeight((int) (MyApplication.getCanvasHeight() * scaleY));
+
+            scaleStatus = IN_LARGE;
+        } else {
+            startX = scaleX;
+            startY = scaleY;
+
+            MyApplication.setCanvasWidth((int) (MyApplication.getCanvasWidth() * 1.0f / scaleX));
+            MyApplication.setCanvasHeight((int) (MyApplication.getCanvasHeight() * 1.0f / scaleY));
+
+            scaleX = 1.0f;
+            scaleY = 1.0f;
+
+            scaleStatus = IN_NORMAL;
+        }
+        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(topDrawLayout, "scaleX", startX, scaleX);
+        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(topDrawLayout, "scaleY", startY, scaleY);
+        scaleXAnimator.setDuration(500);
+        scaleYAnimator.setDuration(500);
+        animatorSet.playTogether(scaleXAnimator, scaleYAnimator);
+        animatorSet.start();
+
+    }
+
+    void doScale() {
+        ScaleAnimation scaleAnimation;
+        float startX, startY, scaleX, scaleY;
+        if (scaleStatus == IN_NORMAL) {
+            startX = 1.0f;
+            startY = 1.0f;
+            scaleX = (float) MyApplication.getScreenWidth() / (float) MyApplication.getCanvasWidth();
+            scaleY = MyApplication.getScreenHeight() * 0.85f / (float) MyApplication.getCanvasHeight();
+
+            scaleStatus = IN_LARGE;
+        } else {
+            startX = (float) MyApplication.getScreenWidth() / (float) MyApplication.getCanvasWidth();
+            startY = MyApplication.getScreenHeight() * 0.85f / (float) MyApplication.getCanvasHeight();
+            scaleX = 1.0f;
+            scaleY = 1.0f;
+
+            scaleStatus = IN_NORMAL;
+        }
+        scaleAnimation = new ScaleAnimation(startX, scaleX, startY, scaleY);
+        scaleAnimation.setDuration(500);
+        scaleAnimation.setFillAfter(true);
+
+        topDrawLayout.setAnimation(scaleAnimation);
+        scaleAnimation.startNow();
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -145,32 +302,30 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
     private void displayImage(String imagePath) {
         if (imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            CanvasView canvasView = new CanvasView(DrawFrontActivity.this, bitmap);
-            canvasView.setOperationListener(new OperationListener() {
+            PhotoView photoView = new PhotoView(DrawFrontActivity.this, bitmap);
+            photoView.setOperationListener(new OperationListener() {
                 @Override
                 public void onDeleteClick() {
-                    canvasView.setInEdit(false);
-                    canvasLayout.removeView(canvasView);
-                    //viewList.remove(canvasView);
+                    photoView.setInEdit(false);
+                    canvasLayout.removeView(photoView);
                 }
 
                 @Override
-                public void onEdit(CanvasView canvasView) {
+                public void onEdit(BaseCanvasView canvasView) {
                     setTopView(canvasView);
                     canvasLayout.bringChildToFront(canvasView);
 
                 }
             });
 
-            canvasLayout.addView(canvasView);
-            setTopView(canvasView);
-            //viewList.add(canvasView);
+            canvasLayout.addView(photoView);
+            setTopView(photoView);
         } else {
             Toast.makeText(this, "failed to get image", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void setTopView(CanvasView canvasView) {
+    public void setTopView(BaseCanvasView canvasView) {
         if (topView != null) {
             topView.setInEdit(false);
         }

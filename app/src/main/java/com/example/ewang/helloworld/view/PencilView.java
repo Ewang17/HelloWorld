@@ -34,15 +34,15 @@ public class PencilView extends View {
 
     private float lastX, lastY;
 
-    private Paint mPaint;
+    private Paint mainPaint;
 
-    private Bitmap mBitmap;
+    private Bitmap tempBitmap;
 
-    private Paint mBitmapPaint;// 画布的画笔
+    private Paint bitmapPaint;// 画布的画笔
 
-    private Canvas mCanvas;
+    private Canvas tempCanvas;
 
-    private Path mPath;
+    private Path tempPath;
 
     private final int PAINT_FILL = 0;
 
@@ -90,10 +90,10 @@ public class PencilView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        if (mPath != null) {
+        canvas.drawBitmap(tempBitmap, 0, 0, bitmapPaint);
+        if (tempPath != null) {
             // 实时的显示
-            canvas.drawPath(mPath, mPaint);
+            canvas.drawPath(tempPath, mainPaint);
         }
     }
 
@@ -107,13 +107,13 @@ public class PencilView extends View {
                 startY = event.getY();
 
                 // 每次down下去重新new一个Path
-                mPath = new Path();
+                tempPath = new Path();
                 //每一次记录的路径对象是不一样的
                 drawPath = new DrawPath();
-                drawPath.path = mPath;
-                drawPath.paint = mPaint;
+                drawPath.path = tempPath;
+                drawPath.paint = mainPaint;
 
-                mPath.moveTo(x, y);
+                tempPath.moveTo(x, y);
                 lastX = x;
                 lastY = y;
 
@@ -123,17 +123,17 @@ public class PencilView extends View {
                 float dx = Math.abs(x - lastX);
                 float dy = Math.abs(lastY - y);
                 if (dx >= TOUCH_MIN_LENGTH || dy >= TOUCH_MIN_LENGTH) {
-                    mPath.quadTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
+                    tempPath.quadTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
                 }
                 lastX = x;
                 lastY = y;
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                mPath.lineTo(lastX, lastY);
-                mCanvas.drawPath(mPath, mPaint);
+                tempPath.lineTo(lastX, lastY);
+                tempCanvas.drawPath(tempPath, mainPaint);
                 //将一条完整的路径保存下来(相当于入栈操作)
-                mPath = null;// 重新置空
+                tempPath = null;// 重新置空
                 savePath.add(drawPath);
                 invalidate();
                 break;
@@ -143,50 +143,51 @@ public class PencilView extends View {
 
     void initCanvas() {
         initPencilStyle();
-        mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-        //画布大小
-        mBitmap = Bitmap.createBitmap(MyApplication.getCanvasWidth(), MyApplication.getCanvasWidth(), Bitmap.Config.ARGB_8888);
+        bitmapPaint = new Paint(Paint.DITHER_FLAG);
+
+        //TODO 屏幕宽度赋值给图片宽度后不适配
+        tempBitmap = Bitmap.createBitmap((int) (MyApplication.getCanvasWidth() / 1.5f), (int) (MyApplication.getCanvasHeight() / 1.5), Bitmap.Config.ARGB_8888);
         //mBitmap设置为透明色
-        mBitmap.eraseColor(Color.argb(0, 0, 0, 0));
-        mCanvas = new Canvas(mBitmap);  //所有mCanvas画的东西都被保存在了mBitmap中
-        mCanvas.drawColor(Color.TRANSPARENT);
+        tempBitmap.eraseColor(Color.argb(0, 0, 0, 0));
+        tempCanvas = new Canvas(tempBitmap);  //所有tempCanvas画的东西都被保存在了mBitmap中
+        tempCanvas.drawColor(Color.TRANSPARENT);
     }
 
     private void initPencilStyle() {
-        mPaint = new Paint();
+        mainPaint = new Paint();
         if (currentPaintStyle == PAINT_FILL) {
-            mPaint.setStyle(Paint.Style.FILL);
+            mainPaint.setStyle(Paint.Style.FILL);
         } else {
-            mPaint.setStyle(Paint.Style.STROKE);
+            mainPaint.setStyle(Paint.Style.STROKE);
         }
-        mPaint.setStrokeJoin(Paint.Join.ROUND);// 设置外边缘
-        mPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        mPaint.setColor(currentColor);
+        mainPaint.setStrokeJoin(Paint.Join.ROUND);// 设置外边缘
+        mainPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
+        mainPaint.setAntiAlias(true);
+        mainPaint.setDither(true);
+        mainPaint.setColor(currentColor);
 
         //手动设置画笔样式
-        mPaint.setAlpha(currentPencilAlpha);
-        mPaint.setStrokeWidth(currentPencilSize);
+        mainPaint.setAlpha(currentPencilAlpha);
+        mainPaint.setStrokeWidth(currentPencilSize);
     }
 
     private void initEraserStyle() {
-        mPaint = new Paint();
+        mainPaint = new Paint();
         if (currentPaintStyle == PAINT_FILL) {
-            mPaint.setStyle(Paint.Style.FILL);
+            mainPaint.setStyle(Paint.Style.FILL);
         } else {
-            mPaint.setStyle(Paint.Style.STROKE);
+            mainPaint.setStyle(Paint.Style.STROKE);
         }
-        mPaint.setStrokeJoin(Paint.Join.ROUND);// 设置外边缘
-        mPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        mPaint.setColor(Color.TRANSPARENT);
+        mainPaint.setStrokeJoin(Paint.Join.ROUND);// 设置外边缘
+        mainPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
+        mainPaint.setAntiAlias(true);
+        mainPaint.setDither(true);
+        mainPaint.setColor(Color.TRANSPARENT);
 
-        mPaint.setAlpha(0);
-        mPaint.setStrokeWidth(currentEraserSize);
+        mainPaint.setAlpha(0);
+        mainPaint.setStrokeWidth(currentEraserSize);
 
-        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+        mainPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
     }
 
     public void setPencilStyle(boolean reset, int currentPencilStatus, int size, int alpha) {
@@ -235,7 +236,7 @@ public class PencilView extends View {
             savePath.add(dp);
             //将取出的路径重绘在画布上
 
-            mCanvas.drawPath(dp.path, dp.paint);
+            tempCanvas.drawPath(dp.path, dp.paint);
             //将该路径从删除的路径列表中去除
             deletePath.remove(deletePath.size() - 1);
 
@@ -248,7 +249,7 @@ public class PencilView extends View {
         Iterator<DrawPath> iter = savePath.iterator();
         while (iter.hasNext()) {
             DrawPath drawPath = iter.next();
-            mCanvas.drawPath(drawPath.path, drawPath.paint);
+            tempCanvas.drawPath(drawPath.path, drawPath.paint);
         }
         invalidate();// 刷新
     }
@@ -283,5 +284,13 @@ public class PencilView extends View {
 
     public void setCurrentEraserSize(int currentEraserSize) {
         this.currentEraserSize = currentEraserSize;
+    }
+
+    public Bitmap getTempBitmap() {
+        return tempBitmap;
+    }
+
+    public Canvas getTempCanvas() {
+        return tempCanvas;
     }
 }

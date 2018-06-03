@@ -8,4 +8,6 @@ public interface OperationListener {
     void onDeleteClick();
 
     void onEdit(BaseCanvasView canvasView);
+
+    void onReeditClick();
 }

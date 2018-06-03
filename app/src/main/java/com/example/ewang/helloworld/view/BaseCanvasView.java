@@ -96,7 +96,9 @@ public class BaseCanvasView extends View {
                     setMidPointFromTouchToLeftTop(event);
                     lastlengthFromTouchToMid = lengthFromTouchToMid(event);
                 } else if (isInOperate(event, rect_reedit)) {
-
+                    if (operationListener != null) {
+                        operationListener.onReeditClick();
+                    }
                 } else if (isInBitmap(event)) {
                     inBitmap = true;
                     lastX = event.getX(0);
@@ -189,7 +191,7 @@ public class BaseCanvasView extends View {
         resizeIconHeight = (int) (resizeIcon.getHeight() * ICON_SCALE);
 
         reeditIconWidth = (int) (reeditIcon.getWidth() * ICON_SCALE);
-        reeditIconWidth = (int) (reeditIcon.getHeight() * ICON_SCALE);
+        reeditIconHeight = (int) (reeditIcon.getHeight() * ICON_SCALE);
 
         rect_delete = new Rect();
         rect_resize = new Rect();

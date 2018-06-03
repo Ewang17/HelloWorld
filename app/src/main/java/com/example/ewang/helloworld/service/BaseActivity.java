@@ -41,6 +41,7 @@ public class BaseActivity extends AppCompatActivity {
         if (MyApplication.getScreenHeight() == 0 || MyApplication.getCanvasWidth() == 0) {
             MyApplication.setScreenWidth(displayMetrics.widthPixels);
             MyApplication.setScreenHeight(displayMetrics.heightPixels);
+            MyApplication.setDisplayMetrics(displayMetrics);
         }
         Log.i(this.getLocalClassName(), "onCreate, 屏幕————" + "宽度:" + MyApplication.getScreenWidth() + ",高度:" + MyApplication.getScreenHeight());
     }

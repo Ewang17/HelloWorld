@@ -2,6 +2,7 @@ package com.example.ewang.helloworld.helper;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.DisplayMetrics;
 
 import com.example.ewang.helloworld.model.User;
 
@@ -15,6 +16,9 @@ public class MyApplication extends Application {
 
     private static User currentUser;
 
+    private static DisplayMetrics displayMetrics;
+
+    //in pixels
     private static int screenWidth;
 
     private static int screenHeight;
@@ -72,5 +76,13 @@ public class MyApplication extends Application {
 
     public static int getCanvasHeight() {
         return canvasHeight;
+    }
+
+    public static DisplayMetrics getDisplayMetrics() {
+        return displayMetrics;
+    }
+
+    public static void setDisplayMetrics(DisplayMetrics displayMetrics) {
+        MyApplication.displayMetrics = displayMetrics;
     }
 }

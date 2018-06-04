@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.ewang.helloworld.adapter.SessionAdapter;
-import com.example.ewang.helloworld.model.Constants;
+import com.example.ewang.helloworld.constants.SystemConstants;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.model.Session;
 import com.example.ewang.helloworld.model.User;
@@ -80,7 +80,7 @@ public class ShowSessionListActivity extends BaseActivity {
 
     void setMessageAdapter(User user) {
         Intent showFriendsIntent = new Intent(ShowSessionListActivity.this, ShowSessionListService.class)
-                .putExtra("url", Constants.DefaultBasicUrl.getValue() + "/session/find")
+                .putExtra("url", SystemConstants.DefaultBasicUrl.getValue() + "/session/find")
                 .putExtra("userId", user.getId());
         startService(showFriendsIntent);
 

@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.ewang.helloworld.R;
-import com.example.ewang.helloworld.model.Msg;
+import com.example.ewang.helloworld.model.client.Msg;
 
 import java.util.List;
 

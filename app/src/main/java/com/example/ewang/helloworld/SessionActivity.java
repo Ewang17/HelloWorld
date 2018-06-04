@@ -13,10 +13,10 @@ import android.widget.TextView;
 
 import com.example.ewang.helloworld.adapter.MsgAdapter;
 import com.example.ewang.helloworld.helper.CustomActivityManager;
-import com.example.ewang.helloworld.model.Constants;
+import com.example.ewang.helloworld.constants.SystemConstants;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.model.SocketMessage;
-import com.example.ewang.helloworld.model.Msg;
+import com.example.ewang.helloworld.model.client.Msg;
 import com.example.ewang.helloworld.model.User;
 import com.example.ewang.helloworld.service.BaseActivity;
 import com.example.ewang.helloworld.service.ClearUnreadService;
@@ -97,7 +97,7 @@ public class SessionActivity extends BaseActivity {
         super.onPause();
         //清理当前会话持有者的未读消息
         Intent clearUnreadIntent = new Intent(CustomActivityManager.getInstance().getCurrentActivity(), ClearUnreadService.class)
-                .putExtra("url", Constants.DefaultBasicUrl.getValue() + "/session/clear/unread")
+                .putExtra("url", SystemConstants.DefaultBasicUrl.getValue() + "/session/clear/unread")
                 .putExtra("userId", userId)
                 .putExtra("toUserId", toUserId);
         CustomActivityManager.getInstance().getCurrentActivity().startService(clearUnreadIntent);
@@ -111,7 +111,7 @@ public class SessionActivity extends BaseActivity {
 
     void showMessages() {
         Intent showMessagesIntent = new Intent(SessionActivity.this, ShowMessagesService.class)
-                .putExtra("url", Constants.DefaultBasicUrl.getValue() + "/session/message/find")
+                .putExtra("url", SystemConstants.DefaultBasicUrl.getValue() + "/session/message/find")
                 .putExtra("userId", userId)
                 .putExtra("toUserId", toUserId);
         startService(showMessagesIntent);
@@ -140,7 +140,7 @@ public class SessionActivity extends BaseActivity {
         }
 
         Intent sendMessageIntent = new Intent(SessionActivity.this, SendMessageService.class)
-                .putExtra("url", Constants.DefaultBasicUrl.getValue() + "/session/message/send")
+                .putExtra("url", SystemConstants.DefaultBasicUrl.getValue() + "/session/message/send")
                 .putExtra("content", content)
                 .putExtra("userId", userId)
                 .putExtra("toUserId", toUserId);

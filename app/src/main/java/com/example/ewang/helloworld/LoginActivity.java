@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.ewang.helloworld.model.Constants;
+import com.example.ewang.helloworld.constants.SystemConstants;
 import com.example.ewang.helloworld.helper.DialogHelper;
 import com.example.ewang.helloworld.service.BaseActivity;
 import com.example.ewang.helloworld.service.LoginService;
@@ -45,7 +45,7 @@ public class LoginActivity extends BaseActivity {
             requestUri = "/user/reg";
         }
 
-        String requestUrl = Constants.DefaultBasicUrl.getValue() + requestUri;
+        String requestUrl = SystemConstants.DefaultBasicUrl.getValue() + requestUri;
         btnSure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

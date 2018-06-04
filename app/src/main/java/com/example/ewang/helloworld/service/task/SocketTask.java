@@ -14,11 +14,11 @@ import com.example.ewang.helloworld.R;
 import com.example.ewang.helloworld.SessionActivity;
 import com.example.ewang.helloworld.ShowSessionListActivity;
 import com.example.ewang.helloworld.helper.CustomActivityManager;
-import com.example.ewang.helloworld.model.Constants;
+import com.example.ewang.helloworld.constants.SystemConstants;
 import com.example.ewang.helloworld.helper.JsonHelper;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.model.SocketMessage;
-import com.example.ewang.helloworld.model.Msg;
+import com.example.ewang.helloworld.model.client.Msg;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -47,18 +47,18 @@ public class SocketTask extends AsyncTask<Object, SocketMessage, Boolean> {
     @Override
     protected Boolean doInBackground(Object... objects) {
         try {
-            socket = new Socket(Constants.ServerIP.getValue(), 7777);
+            socket = new Socket(SystemConstants.ServerIP.getValue(), 7777);
             if (socket == null) {
                 return false;
             }
             outputStream = socket.getOutputStream();
             long id = (long) objects[0];
-            outputStream.write((String.valueOf(id) + "\n").getBytes(Constants.CharsetName.getValue()));
+            outputStream.write((String.valueOf(id) + "\n").getBytes(SystemConstants.CharsetName.getValue()));
 
             EventBus.getDefault().register(this);
 
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(),
-                    Constants.CharsetName.getValue()));
+                    SystemConstants.CharsetName.getValue()));
 
             String msgJson;
             while ((msgJson = readFromServer()) != null) {
@@ -136,7 +136,7 @@ public class SocketTask extends AsyncTask<Object, SocketMessage, Boolean> {
     public void onSendMsgEvent(SocketMessage m) {
         String msgJson = JsonHelper.encode(m);
         try {
-            outputStream.write((msgJson + "\n").getBytes(Constants.CharsetName.getValue()));
+            outputStream.write((msgJson + "\n").getBytes(SystemConstants.CharsetName.getValue()));
         } catch (IOException e) {
             e.printStackTrace();
         }

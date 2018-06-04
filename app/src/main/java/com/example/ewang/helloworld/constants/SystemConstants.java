@@ -1,4 +1,4 @@
-package com.example.ewang.helloworld.model;
+package com.example.ewang.helloworld.constants;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.Map;
  * Created by ewang on 2018/5/5.
  */
 
-public enum Constants {
+public enum SystemConstants {
     ServerIP("10.150.4.125"),
     CharsetName("utf-8"),
     DefaultBasicUrl("http://" + ServerIP.getValue() + ":8080");
@@ -16,12 +16,12 @@ public enum Constants {
 
     private final String value;
 
-    private static Map<String, Constants> valuesMap;
+    private static Map<String, SystemConstants> valuesMap;
 
     static {
         valuesMap = new HashMap<>();
-        for (Constants t : values()) {
-            Constants exist = valuesMap.put(t.value, t);
+        for (SystemConstants t : values()) {
+            SystemConstants exist = valuesMap.put(t.value, t);
             if (exist != null) {
                 throw new IllegalStateException("value冲突: " + exist + " " + t);
             }
@@ -29,7 +29,7 @@ public enum Constants {
         valuesMap = Collections.unmodifiableMap(valuesMap);
     }
 
-    Constants(String value) {
+    SystemConstants(String value) {
         this.value = value;
     }
 
@@ -37,7 +37,7 @@ public enum Constants {
         return value;
     }
 
-    public static Constants fromValue(String value) {
+    public static SystemConstants fromValue(String value) {
         return valuesMap.get(value);
     }
 }

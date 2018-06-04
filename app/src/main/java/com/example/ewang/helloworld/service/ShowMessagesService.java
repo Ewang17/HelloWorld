@@ -10,7 +10,7 @@ import com.example.ewang.helloworld.helper.JsonHelper;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.ResponseWrapper;
 import com.example.ewang.helloworld.model.Message;
-import com.example.ewang.helloworld.model.Msg;
+import com.example.ewang.helloworld.model.client.Msg;
 import com.example.ewang.helloworld.model.User;
 import com.example.ewang.helloworld.service.task.RequestTask;
 import com.example.ewang.helloworld.service.task.ResponseListener;

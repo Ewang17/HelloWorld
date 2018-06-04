@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.example.ewang.helloworld.constants.PaintStatus;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.PopWindowHelper;
 import com.example.ewang.helloworld.service.BaseActivity;
@@ -66,6 +67,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
     ImageView undo;
     ImageView recover;
     ImageView color;
+    ImageView shape;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         undo = findViewById(R.id.image_draw_undo);
         recover = findViewById(R.id.image_draw_recover);
         color = findViewById(R.id.image_draw_color);
+        shape = findViewById(R.id.image_draw_shape);
 
         addPhoto = findViewById(R.id.image_menu_add_photo);
         addPencil = findViewById(R.id.image_menu_pencil);
@@ -98,6 +101,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         undo.setOnClickListener(this);
         recover.setOnClickListener(this);
         color.setOnClickListener(this);
+        shape.setOnClickListener(this);
 
     }
 
@@ -121,7 +125,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
             case R.id.image_draw_pencil:
                 pencil.setColorFilter(R.color.pink);
                 eraser.setColorFilter(null);
-                if (pencilView.getCurrentPencilStatus() == PencilView.IN_PENCIL) {
+                if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_PENCIL) {
                     WindowManager.LayoutParams lp = getWindow().getAttributes();
                     lp.alpha = 0.5f;
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -136,15 +140,15 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                         }
                     });
                 } else {
-                    pencilView.setPencilStyle(false, PencilView.IN_PENCIL,
+                    pencilView.setPencilStyle(false, PaintStatus.IN_PENCIL,
                             pencilView.getCurrentPencilSize(), pencilView.getCurrentPencilAlpha());
-                    pencilView.setCurrentPencilStatus(PencilView.IN_PENCIL);
+                    pencilView.setCurrentPaintStatus(PaintStatus.IN_PENCIL);
                 }
                 break;
             case R.id.image_draw_eraser:
                 eraser.setColorFilter(R.color.pink);
                 pencil.setColorFilter(null);
-                if (pencilView.getCurrentPencilStatus() == PencilView.IN_ERASER) {
+                if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_ERASER) {
                     WindowManager.LayoutParams lp = getWindow().getAttributes();
                     lp.alpha = 0.5f;
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -159,9 +163,9 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                         }
                     });
                 } else {
-                    pencilView.setPencilStyle(false, PencilView.IN_ERASER,
+                    pencilView.setPencilStyle(false, PaintStatus.IN_ERASER,
                             pencilView.getCurrentEraserSize(), 0);
-                    pencilView.setCurrentPencilStatus(PencilView.IN_ERASER);
+                    pencilView.setCurrentPaintStatus(PaintStatus.IN_ERASER);
                 }
                 break;
             case R.id.image_draw_cancel:
@@ -213,7 +217,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
             case R.id.image_draw_color:
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                 alertDialogBuilder.setTitle("选择画笔颜色：");
-                alertDialogBuilder.setSingleChoiceItems(R.array.paintColor, pencilView.getCurrentColorIndex(), new DialogInterface.OnClickListener() {
+                alertDialogBuilder.setSingleChoiceItems(R.array.paintColor, pencilView.getCurrentColor().getIndex(), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         pencilView.setPaintColor(which);
@@ -228,6 +232,8 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 });
                 alertDialogBuilder.create().show();
                 break;
+            case R.id.image_draw_shape:
+
             default:
                 break;
         }

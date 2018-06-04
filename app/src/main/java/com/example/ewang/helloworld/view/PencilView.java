@@ -11,6 +11,9 @@ import android.graphics.PorterDuffXfermode;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.ewang.helloworld.constants.PaintColor;
+import com.example.ewang.helloworld.constants.PaintStatus;
+import com.example.ewang.helloworld.constants.ShapeStyle;
 import com.example.ewang.helloworld.helper.MyApplication;
 
 import java.util.ArrayList;
@@ -44,19 +47,6 @@ public class PencilView extends View {
 
     private Path tempPath;
 
-    private final int PAINT_FILL = 0;
-
-    private final int PAINT_STROKE = 1;
-
-    public static final int IN_PENCIL = 0;
-
-    public static final int IN_ERASER = 1;
-
-    //颜色集合
-    private final int[] paintColor = new int[]{
-            Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.BLACK, Color.WHITE, Color.GRAY, Color.CYAN
-    };
-
     private static final float TOUCH_MIN_LENGTH = 4;
 
     private int currentEraserSize = 20;
@@ -65,13 +55,11 @@ public class PencilView extends View {
 
     private int currentPencilAlpha = 255;
 
-    private int currentColorIndex = 0;
+    private PaintColor currentColor = PaintColor.fromIndex(1);
 
-    private int currentColor = paintColor[currentColorIndex];
+    private ShapeStyle currentShapeStyle = ShapeStyle.PAINT_STROKE;
 
-    private int currentPaintStyle = PAINT_STROKE;
-
-    private int currentPencilStatus = IN_PENCIL;
+    private PaintStatus currentPaintStatus = PaintStatus.IN_PENCIL;
 
     private class DrawPath {
         public Path path;// 路径
@@ -148,7 +136,7 @@ public class PencilView extends View {
         bitmapPaint = new Paint(Paint.DITHER_FLAG);
 
         tempBitmap = Bitmap.createBitmap(MyApplication.getCanvasWidth(), MyApplication.getCanvasHeight(), Bitmap.Config.ARGB_8888);
-        //mBitmap设置为透明色
+        //tempBitmap设置为透明色
         tempBitmap.eraseColor(Color.argb(0, 0, 0, 0));
         tempCanvas = new Canvas(tempBitmap);  //所有tempCanvas画的东西都被保存在了mBitmap中
         tempCanvas.drawColor(Color.TRANSPARENT);
@@ -156,7 +144,7 @@ public class PencilView extends View {
 
     private void initPencilStyle() {
         mainPaint = new Paint();
-        if (currentPaintStyle == PAINT_FILL) {
+        if (currentShapeStyle == ShapeStyle.PAINT_FILL) {
             mainPaint.setStyle(Paint.Style.FILL);
         } else {
             mainPaint.setStyle(Paint.Style.STROKE);
@@ -165,7 +153,7 @@ public class PencilView extends View {
         mainPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
         mainPaint.setAntiAlias(true);
         mainPaint.setDither(true);
-        mainPaint.setColor(currentColor);
+        mainPaint.setColor(currentColor.getValue());
 
         //手动设置画笔样式
         mainPaint.setAlpha(currentPencilAlpha);
@@ -174,7 +162,7 @@ public class PencilView extends View {
 
     private void initEraserStyle() {
         mainPaint = new Paint();
-        if (currentPaintStyle == PAINT_FILL) {
+        if (currentShapeStyle == ShapeStyle.PAINT_FILL) {
             mainPaint.setStyle(Paint.Style.FILL);
         } else {
             mainPaint.setStyle(Paint.Style.STROKE);
@@ -191,20 +179,19 @@ public class PencilView extends View {
         mainPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
     }
 
-    public void setPencilStyle(boolean reset, int currentPencilStatus, int size, int alpha) {
-        if (currentPencilStatus == IN_PENCIL) {
+    public void setPencilStyle(boolean reset, PaintStatus currentPencilStatus, int size, int alpha) {
+        if (currentPencilStatus == PaintStatus.IN_PENCIL) {
             currentPencilSize = reset ? 20 : size;
             currentPencilAlpha = reset ? 255 : alpha;
             initPencilStyle();
-        } else if (currentPencilStatus == IN_ERASER) {
+        } else if (currentPencilStatus == PaintStatus.IN_ERASER) {
             currentEraserSize = reset ? 20 : size;
             initEraserStyle();
         }
     }
 
     public void setPaintColor(int colorIndex) {
-        currentColorIndex = colorIndex;
-        currentColor = paintColor[currentColorIndex];
+        currentColor = PaintColor.fromIndex(colorIndex);
         initPencilStyle();
     }
 
@@ -261,12 +248,12 @@ public class PencilView extends View {
         invalidate();// 刷新
     }
 
-    public int getCurrentPencilStatus() {
-        return currentPencilStatus;
+    public PaintStatus getCurrentPaintStatus() {
+        return currentPaintStatus;
     }
 
-    public void setCurrentPencilStatus(int currentPencilStatus) {
-        this.currentPencilStatus = currentPencilStatus;
+    public void setCurrentPaintStatus(PaintStatus currentPaintStatus) {
+        this.currentPaintStatus = currentPaintStatus;
     }
 
     public int getCurrentPencilSize() {
@@ -301,7 +288,11 @@ public class PencilView extends View {
         return tempCanvas;
     }
 
-    public int getCurrentColorIndex() {
-        return currentColorIndex;
+    public PaintColor getCurrentColor() {
+        return currentColor;
+    }
+
+    public void setCurrentShapeStyle(ShapeStyle currentShapeStyle) {
+        this.currentShapeStyle = currentShapeStyle;
     }
 }

@@ -1,17 +1,27 @@
 package com.example.ewang.helloworld.helper;
 
 import android.content.Context;
+import android.support.annotation.IdRes;
+import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.ewang.helloworld.R;
+import com.example.ewang.helloworld.constants.PaintStatus;
+import com.example.ewang.helloworld.constants.ShapeStyle;
+import com.example.ewang.helloworld.model.client.Shape;
 import com.example.ewang.helloworld.view.PencilView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ewang on 2018/6/2.
@@ -23,6 +33,8 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
     SeekBar seekBar1, seekBar2;
     Button reset;
     TextView text_size, text_alpha;
+    RadioGroup radioGroupShape;
+    RecyclerView recyclerViewShape;
 
 
     PencilView pencilView;
@@ -45,24 +57,26 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
 
 
     private void initPencilPopWinListener(View winContentView) {
-        reset = (Button) winContentView.findViewById(R.id.reset);
-        popSure = (ImageView) winContentView.findViewById(R.id.popbtn_sure);
-        popCancel = (ImageView) winContentView.findViewById(R.id.popbtn_cancel);
-        plus = (ImageView) winContentView.findViewById(R.id.plus);
-        minus = (ImageView) winContentView.findViewById(R.id.minus);
-        plus2 = (ImageView) winContentView.findViewById(R.id.plus2);
-        minus2 = (ImageView) winContentView.findViewById(R.id.minus2);
-        seekBar1 = (SeekBar) winContentView.findViewById(R.id.size_seekbar);
-        seekBar2 = (SeekBar) winContentView.findViewById(R.id.size_seekbar2);
-        text_size = (TextView) winContentView.findViewById(R.id.text_size);
-        text_alpha = (TextView) winContentView.findViewById(R.id.text_alpha);
+        reset = winContentView.findViewById(R.id.reset);
+        popSure = winContentView.findViewById(R.id.popbtn_sure);
+        popCancel = winContentView.findViewById(R.id.popbtn_cancel);
+        plus = winContentView.findViewById(R.id.plus);
+        minus = winContentView.findViewById(R.id.minus);
+        plus2 = winContentView.findViewById(R.id.plus2);
+        minus2 = winContentView.findViewById(R.id.minus2);
+        seekBar1 = winContentView.findViewById(R.id.size_seekbar);
+        seekBar2 = winContentView.findViewById(R.id.size_seekbar2);
+        text_size = winContentView.findViewById(R.id.text_size);
+        text_alpha = winContentView.findViewById(R.id.text_alpha);
+        radioGroupShape = winContentView.findViewById(R.id.radioGroup);
+        recyclerViewShape = winContentView.findViewById(R.id.recycler_view_shape);
 
-        seekBar1.setProgress((pencilView.getCurrentPencilStatus() == PencilView.IN_PENCIL ? pencilView.getCurrentPencilSize() : pencilView.getCurrentEraserSize()) / 2);
+        seekBar1.setProgress((pencilView.getCurrentPaintStatus() == PaintStatus.IN_ERASER ? pencilView.getCurrentEraserSize() : pencilView.getCurrentPencilSize()) / 2);
 
-        if (pencilView.getCurrentPencilStatus() == PencilView.IN_PENCIL) {
-            seekBar2.setProgress(pencilView.getCurrentPencilAlpha() * 100 / 255);
-        } else {
+        if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_ERASER) {
             seekBar2.setEnabled(false);
+        } else {
+            seekBar2.setProgress(pencilView.getCurrentPencilAlpha() * 100 / 255);
         }
 
         text_size.setText("尺寸：" + seekBar1.getProgress());
@@ -78,16 +92,53 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
         seekBar1.setOnSeekBarChangeListener(this);
         seekBar2.setOnSeekBarChangeListener(this);
 
+        radioGroupShape.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                RadioButton radiobtn = winContentView.findViewById(checkedId);
+                if (radiobtn.getId() == R.id.fill_shape) {
+                    pencilView.setCurrentShapeStyle(ShapeStyle.PAINT_FILL);
+                    seekBar1.setEnabled(false);
+                } else if (radiobtn.getId() == R.id.stroke_shape) {
+                    pencilView.setCurrentShapeStyle(ShapeStyle.PAINT_STROKE);
+                    seekBar1.setEnabled(true);
+                }
+            }
+        });
+
+        if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_SHAPE) {
+            radioGroupShape.setVisibility(View.VISIBLE);
+            recyclerViewShape.setVisibility(View.VISIBLE);
+            reset.setVisibility(View.INVISIBLE);
+        } else {
+            radioGroupShape.setVisibility(View.INVISIBLE);
+            recyclerViewShape.setVisibility(View.INVISIBLE);
+            reset.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    void initShapeRecyclerView() {
+        Shape circle = new Shape(1, "circle", R.drawable.ic_shape_circle);
+        Shape rectangle = new Shape(2, "rectangle", R.drawable.ic_shape_rectangle);
+        Shape triangle = new Shape(3, "triangle", R.drawable.ic_shape_triangle);
+        Shape arrow = new Shape(4, "arrow", R.drawable.ic_shape_arrow);
+
+        List<Shape> shapeList = new ArrayList<>();
+        shapeList.add(circle);
+        shapeList.add(rectangle);
+        shapeList.add(triangle);
+        shapeList.add(arrow);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset:
-                pencilView.setPencilStyle(true, pencilView.getCurrentPencilStatus(), 0, 0);
+                pencilView.setPencilStyle(true, pencilView.getCurrentPaintStatus(), 0, 0);
                 break;
             case R.id.popbtn_sure:
-                pencilView.setPencilStyle(false, pencilView.getCurrentPencilStatus(),
+                pencilView.setPencilStyle(false, pencilView.getCurrentPaintStatus(),
                         seekBar1.getProgress() * 2, (seekBar2.getProgress() * 255 / 100));
                 pencil_window.dismiss();
                 break;

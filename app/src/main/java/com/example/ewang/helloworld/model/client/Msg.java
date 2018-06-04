@@ -1,4 +1,4 @@
-package com.example.ewang.helloworld.model;
+package com.example.ewang.helloworld.model.client;
 
 /**
  * Created by ewang on 2018/4/9.

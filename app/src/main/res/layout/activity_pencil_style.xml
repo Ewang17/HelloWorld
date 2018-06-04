@@ -51,6 +51,13 @@
 
     </FrameLayout>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_shape"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/colorPrimary"
+        android:visibility="invisible" />
 
     <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
@@ -151,6 +158,36 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
             android:text="重置" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/relative_layout2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:visibility="invisible">
+
+            <RadioButton
+                android:id="@+id/fill_shape"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:text="填充"
+                android:textSize="20dp" />
+
+            <RadioButton
+                android:id="@+id/stroke_shape"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="20dp"
+                android:checked="true"
+                android:text="描边"
+                android:textSize="20dp" />
+
+        </RadioGroup>
 
 
     </android.support.percent.PercentRelativeLayout>

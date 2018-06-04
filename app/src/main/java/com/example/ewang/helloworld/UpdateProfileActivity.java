@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.example.ewang.helloworld.helper.CustomActivityManager;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.ResponseWrapper;
-import com.example.ewang.helloworld.model.Constants;
+import com.example.ewang.helloworld.constants.SystemConstants;
 import com.example.ewang.helloworld.service.BaseActivity;
 import com.example.ewang.helloworld.service.UploadImageService;
 import com.example.ewang.helloworld.service.task.RequestTask;
@@ -76,7 +76,7 @@ public class UpdateProfileActivity extends BaseActivity {
                             CustomActivityManager.getInstance().getCurrentActivity().startActivity(intent);
                         }
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                            Constants.DefaultBasicUrl.getValue() + "/user/update/profile", requestBody);
+                            SystemConstants.DefaultBasicUrl.getValue() + "/user/update/profile", requestBody);
                 }
             }
         });
@@ -152,7 +152,7 @@ public class UpdateProfileActivity extends BaseActivity {
     private void displayImage(String imagePath) {
         if (imagePath != null) {
             Intent uploadIntent = new Intent(UpdateProfileActivity.this, UploadImageService.class)
-                    .putExtra("url", Constants.DefaultBasicUrl.getValue() + "/upload/image")
+                    .putExtra("url", SystemConstants.DefaultBasicUrl.getValue() + "/upload/image")
                     .putExtra("imagePath", imagePath);
             startService(uploadIntent);
 

@@ -8,12 +8,15 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.ewang.helloworld.constants.PaintColor;
+import com.example.ewang.helloworld.constants.PaintGraphics;
 import com.example.ewang.helloworld.constants.PaintStatus;
 import com.example.ewang.helloworld.constants.ShapeStyle;
+import com.example.ewang.helloworld.helper.DrawGraphicsHelper;
 import com.example.ewang.helloworld.helper.MyApplication;
 
 import java.util.ArrayList;
@@ -55,11 +58,13 @@ public class PencilView extends View {
 
     private int currentPencilAlpha = 255;
 
-    private PaintColor currentColor = PaintColor.fromIndex(1);
+    private PaintColor currentColor = PaintColor.fromIndex(0);
 
     private ShapeStyle currentShapeStyle = ShapeStyle.PAINT_STROKE;
 
     private PaintStatus currentPaintStatus = PaintStatus.IN_PENCIL;
+
+    private PaintGraphics currentPaintGraphics = PaintGraphics.DRAW_LINE;
 
     private class DrawPath {
         public Path path;// 路径
@@ -110,17 +115,13 @@ public class PencilView extends View {
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-                float dx = Math.abs(x - lastX);
-                float dy = Math.abs(lastY - y);
-                if (dx >= TOUCH_MIN_LENGTH || dy >= TOUCH_MIN_LENGTH) {
-                    tempPath.quadTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
-                }
-                lastX = x;
-                lastY = y;
+                touchMove(x, y);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                tempPath.lineTo(lastX, lastY);
+                if (currentPaintGraphics == PaintGraphics.DRAW_LINE) {
+                    tempPath.lineTo(lastX, lastY);
+                }
                 tempCanvas.drawPath(tempPath, mainPaint);
                 //将一条完整的路径保存下来(相当于入栈操作)
                 tempPath = null;// 重新置空
@@ -129,6 +130,35 @@ public class PencilView extends View {
                 break;
         }
         return true;
+    }
+
+    private void touchMove(float x, float y) {
+        float dx = Math.abs(x - lastX);
+        float dy = Math.abs(lastY - y);
+        if (dx >= TOUCH_MIN_LENGTH || dy >= TOUCH_MIN_LENGTH) {
+            if (currentPaintGraphics == PaintGraphics.DRAW_LINE) {
+                // 从x1,y1到x2,y2画一条贝塞尔曲线，更平滑(直接用tempPath.lineTo也可以)
+                tempPath.quadTo(lastX, lastY, (x + lastX) / 2, (y + lastY) / 2);
+            } else if (currentPaintGraphics == PaintGraphics.DRAW_CIRCLE) {
+                tempPath.reset();
+                RectF ovalRectF = new RectF(startX, startY, x, y);
+                //画椭圆
+                tempPath.addOval(ovalRectF, Path.Direction.CCW);
+            } else if (currentPaintGraphics == PaintGraphics.DRAW_RECTANGLE) {
+                tempPath.reset();
+                RectF rectF = new RectF(startX, startY, x, y);
+                tempPath.addRect(rectF, Path.Direction.CCW);
+            } else if (currentPaintGraphics == PaintGraphics.DRAW_ARROW) {
+                tempPath.reset();
+                DrawGraphicsHelper.drawArrow(tempPath, (int) startX, (int) startY, (int) x, (int) y);
+            } else if (currentPaintGraphics == PaintGraphics.DRAW_TRIANGLE) {
+                tempPath.reset();
+                DrawGraphicsHelper.drawTriangle(tempPath, (int) startX, (int) startY, (int) x, (int) y);
+            }
+
+            lastX = x;
+            lastY = y;
+        }
     }
 
     void initCanvas() {
@@ -179,14 +209,15 @@ public class PencilView extends View {
         mainPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
     }
 
-    public void setPencilStyle(boolean reset, PaintStatus currentPencilStatus, int size, int alpha) {
-        if (currentPencilStatus == PaintStatus.IN_PENCIL) {
+    public void setPencilStyle(boolean reset, PaintStatus currentPencilStatus, int size, int alpha, PaintGraphics paintGraphics) {
+        currentPaintGraphics = paintGraphics;
+        if (currentPencilStatus == PaintStatus.IN_ERASER) {
+            currentEraserSize = reset ? 20 : size;
+            initEraserStyle();
+        } else {
             currentPencilSize = reset ? 20 : size;
             currentPencilAlpha = reset ? 255 : alpha;
             initPencilStyle();
-        } else if (currentPencilStatus == PaintStatus.IN_ERASER) {
-            currentEraserSize = reset ? 20 : size;
-            initEraserStyle();
         }
     }
 
@@ -294,5 +325,13 @@ public class PencilView extends View {
 
     public void setCurrentShapeStyle(ShapeStyle currentShapeStyle) {
         this.currentShapeStyle = currentShapeStyle;
+    }
+
+    public ShapeStyle getCurrentShapeStyle() {
+        return currentShapeStyle;
+    }
+
+    public PaintGraphics getCurrentPaintGraphics() {
+        return currentPaintGraphics;
     }
 }

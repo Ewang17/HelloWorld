@@ -2,6 +2,7 @@ package com.example.ewang.helloworld.helper;
 
 import android.content.Context;
 import android.support.annotation.IdRes;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,6 +16,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.ewang.helloworld.R;
+import com.example.ewang.helloworld.adapter.ShapeAdapter;
+import com.example.ewang.helloworld.constants.PaintGraphics;
 import com.example.ewang.helloworld.constants.PaintStatus;
 import com.example.ewang.helloworld.constants.ShapeStyle;
 import com.example.ewang.helloworld.model.client.Shape;
@@ -29,6 +32,8 @@ import java.util.List;
 
 public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
+    private Context context;
+
     ImageView popSure, popCancel, plus, minus, plus2, minus2;
     SeekBar seekBar1, seekBar2;
     Button reset;
@@ -40,8 +45,11 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
     PencilView pencilView;
     PopupWindow pencil_window;
 
-    public PopWindowHelper(PencilView pencilView) {
+    private PaintGraphics currentPaintGraphics = PaintGraphics.DRAW_LINE;
+
+    public PopWindowHelper(PencilView pencilView, Context context) {
         this.pencilView = pencilView;
+        this.context = context;
     }
 
     public void showPencilStyle(Context context, View parentView, PopupWindow.OnDismissListener onDismissListener) {
@@ -92,6 +100,11 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
         seekBar1.setOnSeekBarChangeListener(this);
         seekBar2.setOnSeekBarChangeListener(this);
 
+        if (pencilView.getCurrentShapeStyle() == ShapeStyle.PAINT_FILL) {
+            radioGroupShape.check(R.id.fill_shape);
+        } else if (pencilView.getCurrentShapeStyle() == ShapeStyle.PAINT_STROKE) {
+            radioGroupShape.check(R.id.stroke_shape);
+        }
         radioGroupShape.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
@@ -110,6 +123,7 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
             radioGroupShape.setVisibility(View.VISIBLE);
             recyclerViewShape.setVisibility(View.VISIBLE);
             reset.setVisibility(View.INVISIBLE);
+            initShapeRecyclerView();
         } else {
             radioGroupShape.setVisibility(View.INVISIBLE);
             recyclerViewShape.setVisibility(View.INVISIBLE);
@@ -119,27 +133,33 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
     }
 
     void initShapeRecyclerView() {
-        Shape circle = new Shape(1, "circle", R.drawable.ic_shape_circle);
-        Shape rectangle = new Shape(2, "rectangle", R.drawable.ic_shape_rectangle);
-        Shape triangle = new Shape(3, "triangle", R.drawable.ic_shape_triangle);
-        Shape arrow = new Shape(4, "arrow", R.drawable.ic_shape_arrow);
+        Shape circle = new Shape(PaintGraphics.DRAW_CIRCLE.getValue(), "circle", R.drawable.ic_shape_circle);
+        Shape rectangle = new Shape(PaintGraphics.DRAW_RECTANGLE.getValue(), "rectangle", R.drawable.ic_shape_rectangle);
+        Shape triangle = new Shape(PaintGraphics.DRAW_TRIANGLE.getValue(), "triangle", R.drawable.ic_shape_triangle);
+        Shape arrow = new Shape(PaintGraphics.DRAW_ARROW.getValue(), "arrow", R.drawable.ic_shape_arrow);
 
         List<Shape> shapeList = new ArrayList<>();
         shapeList.add(circle);
         shapeList.add(rectangle);
         shapeList.add(triangle);
         shapeList.add(arrow);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        recyclerViewShape.setLayoutManager(linearLayoutManager);
+        ShapeAdapter shapeAdapter = new ShapeAdapter(shapeList, this);
+        recyclerViewShape.setAdapter(shapeAdapter);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset:
-                pencilView.setPencilStyle(true, pencilView.getCurrentPaintStatus(), 0, 0);
+                pencilView.setPencilStyle(true, pencilView.getCurrentPaintStatus(), 0, 0, currentPaintGraphics);
                 break;
             case R.id.popbtn_sure:
                 pencilView.setPencilStyle(false, pencilView.getCurrentPaintStatus(),
-                        seekBar1.getProgress() * 2, (seekBar2.getProgress() * 255 / 100));
+                        seekBar1.getProgress() * 2, (seekBar2.getProgress() * 255 / 100), currentPaintGraphics);
                 pencil_window.dismiss();
                 break;
             case R.id.popbtn_cancel:
@@ -191,4 +211,11 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
 
     }
 
+    public void setCurrentPaintGraphics(PaintGraphics currentPaintGraphics) {
+        this.currentPaintGraphics = currentPaintGraphics;
+    }
+
+    public PaintGraphics getCurrentPaintGraphics() {
+        return currentPaintGraphics;
+    }
 }

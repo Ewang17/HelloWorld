@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.example.ewang.helloworld.constants.PaintGraphics;
 import com.example.ewang.helloworld.constants.PaintStatus;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.PopWindowHelper;
@@ -116,55 +117,37 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
             case R.id.image_menu_pencil:
                 doScale();
                 pencilView = new PencilView(this);
-                popWindowHelper = new PopWindowHelper(pencilView);
+                popWindowHelper = new PopWindowHelper(pencilView, DrawFrontActivity.this);
                 canvasLayout.addView(pencilView);
                 basicDrawBar.setVisibility(View.INVISIBLE);
                 pencilDrawBar.setVisibility(View.VISIBLE);
                 pencil.setColorFilter(R.color.pink);
+                eraser.setColorFilter(null);
+                shape.setColorFilter(null);
                 break;
             case R.id.image_draw_pencil:
                 pencil.setColorFilter(R.color.pink);
                 eraser.setColorFilter(null);
+                shape.setColorFilter(null);
                 if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_PENCIL) {
-                    WindowManager.LayoutParams lp = getWindow().getAttributes();
-                    lp.alpha = 0.5f;
-                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                    getWindow().setAttributes(lp);
-                    popWindowHelper.showPencilStyle(this, v, new PopupWindow.OnDismissListener() {
-                        @Override
-                        public void onDismiss() {
-                            WindowManager.LayoutParams lp = getWindow().getAttributes();
-                            lp.alpha = 1.0f;
-                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                            getWindow().setAttributes(lp);
-                        }
-                    });
+                    setBackgroundWindowDim();
+                    popWindowHelper.showPencilStyle(this, v, getOnDismissListener());
                 } else {
                     pencilView.setPencilStyle(false, PaintStatus.IN_PENCIL,
-                            pencilView.getCurrentPencilSize(), pencilView.getCurrentPencilAlpha());
+                            pencilView.getCurrentPencilSize(), pencilView.getCurrentPencilAlpha(), PaintGraphics.DRAW_LINE);
                     pencilView.setCurrentPaintStatus(PaintStatus.IN_PENCIL);
                 }
                 break;
             case R.id.image_draw_eraser:
                 eraser.setColorFilter(R.color.pink);
                 pencil.setColorFilter(null);
+                shape.setColorFilter(null);
                 if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_ERASER) {
-                    WindowManager.LayoutParams lp = getWindow().getAttributes();
-                    lp.alpha = 0.5f;
-                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                    getWindow().setAttributes(lp);
-                    popWindowHelper.showPencilStyle(this, v, new PopupWindow.OnDismissListener() {
-                        @Override
-                        public void onDismiss() {
-                            WindowManager.LayoutParams lp = getWindow().getAttributes();
-                            lp.alpha = 1.0f;
-                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                            getWindow().setAttributes(lp);
-                        }
-                    });
+                    setBackgroundWindowDim();
+                    popWindowHelper.showPencilStyle(this, v, getOnDismissListener());
                 } else {
                     pencilView.setPencilStyle(false, PaintStatus.IN_ERASER,
-                            pencilView.getCurrentEraserSize(), 0);
+                            pencilView.getCurrentEraserSize(), 0, PaintGraphics.DRAW_LINE);
                     pencilView.setCurrentPaintStatus(PaintStatus.IN_ERASER);
                 }
                 break;
@@ -193,7 +176,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                     @Override
                     public void onReeditClick() {
                         doScale();
-                        popWindowHelper = new PopWindowHelper(drawView.getPencilView());
+                        popWindowHelper = new PopWindowHelper(drawView.getPencilView(), DrawFrontActivity.this);
                         canvasLayout.addView(drawView.getPencilView());
                         basicDrawBar.setVisibility(View.INVISIBLE);
                         pencilDrawBar.setVisibility(View.VISIBLE);
@@ -233,10 +216,34 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 alertDialogBuilder.create().show();
                 break;
             case R.id.image_draw_shape:
-
+                pencilView.setCurrentPaintStatus(PaintStatus.IN_SHAPE);
+                shape.setColorFilter(R.color.pink);
+                pencil.setColorFilter(null);
+                eraser.setColorFilter(null);
+                setBackgroundWindowDim();
+                popWindowHelper.showPencilStyle(this, v, getOnDismissListener());
             default:
                 break;
         }
+    }
+
+    void setBackgroundWindowDim() {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = 0.5f;
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        getWindow().setAttributes(lp);
+    }
+
+    PopupWindow.OnDismissListener getOnDismissListener() {
+        return new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.alpha = 1.0f;
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                getWindow().setAttributes(lp);
+            }
+        };
     }
 
     void doScale() {

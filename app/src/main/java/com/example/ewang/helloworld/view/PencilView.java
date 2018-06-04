@@ -65,7 +65,9 @@ public class PencilView extends View {
 
     private int currentPencilAlpha = 255;
 
-    private int currentColor = paintColor[0];
+    private int currentColorIndex = 0;
+
+    private int currentColor = paintColor[currentColorIndex];
 
     private int currentPaintStyle = PAINT_STROKE;
 
@@ -200,6 +202,12 @@ public class PencilView extends View {
         }
     }
 
+    public void setPaintColor(int colorIndex) {
+        currentColorIndex = colorIndex;
+        currentColor = paintColor[currentColorIndex];
+        initPencilStyle();
+    }
+
     /**
      * 撤销
      * 撤销的核心思想就是将画布清空，
@@ -291,5 +299,9 @@ public class PencilView extends View {
 
     public Canvas getTempCanvas() {
         return tempCanvas;
+    }
+
+    public int getCurrentColorIndex() {
+        return currentColorIndex;
     }
 }

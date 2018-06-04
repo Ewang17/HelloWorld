@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.percent.PercentRelativeLayout;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -61,6 +63,9 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
     ImageView eraser;
     ImageView cancel;
     ImageView done;
+    ImageView undo;
+    ImageView recover;
+    ImageView color;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +82,9 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         eraser = findViewById(R.id.image_draw_eraser);
         cancel = findViewById(R.id.image_draw_cancel);
         done = findViewById(R.id.image_draw_done);
+        undo = findViewById(R.id.image_draw_undo);
+        recover = findViewById(R.id.image_draw_recover);
+        color = findViewById(R.id.image_draw_color);
 
         addPhoto = findViewById(R.id.image_menu_add_photo);
         addPencil = findViewById(R.id.image_menu_pencil);
@@ -87,6 +95,9 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         eraser.setOnClickListener(this);
         cancel.setOnClickListener(this);
         done.setOnClickListener(this);
+        undo.setOnClickListener(this);
+        recover.setOnClickListener(this);
+        color.setOnClickListener(this);
 
     }
 
@@ -192,6 +203,30 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 canvasLayout.removeView(pencilView);
                 pencilDrawBar.setVisibility(View.INVISIBLE);
                 basicDrawBar.setVisibility(View.VISIBLE);
+                break;
+            case R.id.image_draw_undo:
+                pencilView.undo();
+                break;
+            case R.id.image_draw_recover:
+                pencilView.recover();
+                break;
+            case R.id.image_draw_color:
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setTitle("选择画笔颜色：");
+                alertDialogBuilder.setSingleChoiceItems(R.array.paintColor, pencilView.getCurrentColorIndex(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pencilView.setPaintColor(which);
+                        dialog.dismiss();
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alertDialogBuilder.create().show();
                 break;
             default:
                 break;

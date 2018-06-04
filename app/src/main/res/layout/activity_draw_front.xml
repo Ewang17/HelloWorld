@@ -122,7 +122,7 @@
             app:layout_widthPercent="25%" />
 
         <ImageView
-            android:id="@+id/image_draw_redo"
+            android:id="@+id/image_draw_recover"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@id/image_draw_done"
             android:src="@drawable/ic_action_redo"

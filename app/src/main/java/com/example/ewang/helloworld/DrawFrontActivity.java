@@ -207,16 +207,10 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
             scaleX = topDrawLayout.getWidth() * 0.9f / MyApplication.getCanvasWidth();
             scaleY = topDrawLayout.getHeight() * 0.9f / MyApplication.getCanvasHeight();
 
-            MyApplication.setCanvasWidth((int) (MyApplication.getCanvasWidth() * scaleX));
-            MyApplication.setCanvasHeight((int) (MyApplication.getCanvasHeight() * scaleY));
-
             scaleStatus = IN_LARGE;
         } else {
             startX = scaleX;
             startY = scaleY;
-
-            MyApplication.setCanvasWidth((int) (MyApplication.getCanvasWidth() * 1f / scaleX));
-            MyApplication.setCanvasHeight((int) (MyApplication.getCanvasHeight() * 1f / scaleY));
 
             scaleX = 1.0f;
             scaleY = 1.0f;
@@ -229,6 +223,8 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         scaleYAnimator.setDuration(500);
         animatorSet.playTogether(scaleXAnimator, scaleYAnimator);
         animatorSet.start();
+        MyApplication.setCanvasWidth(canvasLayout.getWidth());
+        MyApplication.setCanvasHeight(canvasLayout.getHeight());
 
     }
 

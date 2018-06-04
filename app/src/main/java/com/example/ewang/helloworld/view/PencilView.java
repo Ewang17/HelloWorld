@@ -145,8 +145,7 @@ public class PencilView extends View {
         initPencilStyle();
         bitmapPaint = new Paint(Paint.DITHER_FLAG);
 
-        //TODO 屏幕宽度赋值给图片宽度后不适配
-        tempBitmap = Bitmap.createBitmap((int) (MyApplication.getCanvasWidth() / 1.5f), (int) (MyApplication.getCanvasHeight() / 1.5), Bitmap.Config.ARGB_8888);
+        tempBitmap = Bitmap.createBitmap(MyApplication.getCanvasWidth(), MyApplication.getCanvasHeight(), Bitmap.Config.ARGB_8888);
         //mBitmap设置为透明色
         tempBitmap.eraseColor(Color.argb(0, 0, 0, 0));
         tempCanvas = new Canvas(tempBitmap);  //所有tempCanvas画的东西都被保存在了mBitmap中

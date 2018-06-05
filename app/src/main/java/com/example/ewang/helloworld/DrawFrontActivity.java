@@ -32,9 +32,9 @@ import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.PopWindowHelper;
 import com.example.ewang.helloworld.service.BaseActivity;
 import com.example.ewang.helloworld.view.BaseCanvasView;
-import com.example.ewang.helloworld.view.DrawView;
+import com.example.ewang.helloworld.view.ChildDrawView;
 import com.example.ewang.helloworld.view.PencilView;
-import com.example.ewang.helloworld.view.PhotoView;
+import com.example.ewang.helloworld.view.ChildPhotoView;
 import com.example.ewang.helloworld.view.OperationListener;
 
 
@@ -60,6 +60,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
 
     ImageView addPhoto;
     ImageView addPencil;
+    ImageView addText;
 
     ImageView pencil;
     ImageView eraser;
@@ -92,9 +93,12 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
 
         addPhoto = findViewById(R.id.image_menu_add_photo);
         addPencil = findViewById(R.id.image_menu_pencil);
+        addText = findViewById(R.id.image_menu_text);
 
         addPhoto.setOnClickListener(this);
         addPencil.setOnClickListener(this);
+        addText.setOnClickListener(this);
+
         pencil.setOnClickListener(this);
         eraser.setOnClickListener(this);
         cancel.setOnClickListener(this);
@@ -159,12 +163,12 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 break;
             case R.id.image_draw_done:
                 doScale();
-                DrawView drawView = new DrawView(DrawFrontActivity.this, pencilView);
-                drawView.setOperationListener(new OperationListener() {
+                ChildDrawView childDrawView = new ChildDrawView(DrawFrontActivity.this, pencilView);
+                childDrawView.setOperationListener(new OperationListener() {
                     @Override
                     public void onDeleteClick() {
-                        drawView.setInEdit(false);
-                        canvasLayout.removeView(drawView);
+                        childDrawView.setInEdit(false);
+                        canvasLayout.removeView(childDrawView);
                     }
 
                     @Override
@@ -176,17 +180,17 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                     @Override
                     public void onReeditClick() {
                         doScale();
-                        popWindowHelper = new PopWindowHelper(drawView.getPencilView(), DrawFrontActivity.this);
-                        canvasLayout.addView(drawView.getPencilView());
+                        popWindowHelper = new PopWindowHelper(childDrawView.getPencilView(), DrawFrontActivity.this);
+                        canvasLayout.addView(childDrawView.getPencilView());
                         basicDrawBar.setVisibility(View.INVISIBLE);
                         pencilDrawBar.setVisibility(View.VISIBLE);
                         pencil.setColorFilter(R.color.pink);
-                        canvasLayout.removeView(drawView);
+                        canvasLayout.removeView(childDrawView);
                     }
                 });
 
-                canvasLayout.addView(drawView);
-                setTopView(drawView);
+                canvasLayout.addView(childDrawView);
+                setTopView(childDrawView);
                 canvasLayout.removeView(pencilView);
                 pencilDrawBar.setVisibility(View.INVISIBLE);
                 basicDrawBar.setVisibility(View.VISIBLE);
@@ -222,6 +226,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 eraser.setColorFilter(null);
                 setBackgroundWindowDim();
                 popWindowHelper.showPencilStyle(this, v, getOnDismissListener());
+                break;
             default:
                 break;
         }
@@ -358,12 +363,12 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
     private void displayImage(String imagePath) {
         if (imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            PhotoView photoView = new PhotoView(DrawFrontActivity.this, bitmap);
-            photoView.setOperationListener(new OperationListener() {
+            ChildPhotoView childPhotoView = new ChildPhotoView(DrawFrontActivity.this, bitmap);
+            childPhotoView.setOperationListener(new OperationListener() {
                 @Override
                 public void onDeleteClick() {
-                    photoView.setInEdit(false);
-                    canvasLayout.removeView(photoView);
+                    childPhotoView.setInEdit(false);
+                    canvasLayout.removeView(childPhotoView);
                 }
 
                 @Override
@@ -377,8 +382,8 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 }
             });
 
-            canvasLayout.addView(photoView);
-            setTopView(photoView);
+            canvasLayout.addView(childPhotoView);
+            setTopView(childPhotoView);
         } else {
             Toast.makeText(this, "failed to get image", Toast.LENGTH_SHORT).show();
         }

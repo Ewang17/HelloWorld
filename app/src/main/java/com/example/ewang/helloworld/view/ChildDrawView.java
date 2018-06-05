@@ -5,16 +5,19 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 /**
- * Created by ewang on 2018/5/29.
+ * Created by ewang on 2018/6/3.
  */
 
-public class PhotoView extends BaseCanvasView {
-
+public class ChildDrawView extends BaseCanvasView {
     private Bitmap mainBitmap;
+    private PencilView pencilView;
 
-    public PhotoView(Context context, Bitmap bitmap) {
+    public ChildDrawView(Context context, PencilView pencilView) {
         super(context);
+
+        Bitmap bitmap = pencilView.getTempBitmap();
         mainBitmap = bitmap;
+        this.pencilView = pencilView;
 
         matrix.reset();
 
@@ -25,9 +28,6 @@ public class PhotoView extends BaseCanvasView {
         initPaint();
         initScale(bitmap);
 
-        float initScale = (MIN_SCALE + MAX_SCALE) / 2;
-        matrix.postScale(initScale, initScale, bitmapWidth / 2, bitmapHeight / 2);
-        matrix.postTranslate(canvasWidth / 2 - bitmapWidth / 2, canvasHeight / 2 - bitmapHeight / 2);
         invalidate();
 
     }
@@ -46,4 +46,7 @@ public class PhotoView extends BaseCanvasView {
 
     }
 
+    public PencilView getPencilView() {
+        return pencilView;
+    }
 }

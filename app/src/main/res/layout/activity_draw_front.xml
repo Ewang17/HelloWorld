@@ -8,10 +8,31 @@
     tools:context="com.example.ewang.helloworld.DrawFrontActivity">
 
     <android.support.percent.PercentRelativeLayout
-        android:id="@+id/layout_top_draw_area"
         android:layout_gravity="top"
         android:background="@color/grey"
-        app:layout_heightPercent="85%"
+        app:layout_heightPercent="10%"
+        app:layout_widthPercent="100%">
+
+        <ImageView
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_common_close_white_bounding"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="20%" />
+
+        <ImageView
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_common_done_white_bounding"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="20%" />
+    </android.support.percent.PercentRelativeLayout>
+
+    <android.support.percent.PercentRelativeLayout
+        android:id="@+id/layout_center_draw_area"
+        android:layout_gravity="center"
+        android:background="@color/grey"
+        app:layout_heightPercent="80%"
         app:layout_widthPercent="100%">
 
 
@@ -62,7 +83,7 @@
         android:id="@+id/layout_basic_bar"
         android:layout_gravity="bottom"
         android:background="@color/grey"
-        app:layout_heightPercent="15%"
+        app:layout_heightPercent="10%"
         app:layout_widthPercent="100%">
 
         <ImageView
@@ -70,14 +91,14 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_menu_add_photo"
-            app:layout_heightPercent="60%"
+            app:layout_heightPercent="100%"
             app:layout_widthPercent="25%" />
 
         <ImageView
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/image_menu_add_photo"
             android:src="@drawable/ic_menu_add_photo"
-            app:layout_heightPercent="60%"
+            app:layout_heightPercent="100%"
             app:layout_widthPercent="25%" />
 
         <ImageView
@@ -85,7 +106,7 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/image_menu_pencil"
             android:src="@drawable/ic_menu_add_curved_text"
-            app:layout_heightPercent="60%"
+            app:layout_heightPercent="100%"
             app:layout_widthPercent="25%" />
 
         <ImageView
@@ -93,7 +114,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_draw_white"
-            app:layout_heightPercent="60%"
+            app:layout_heightPercent="100%"
             app:layout_widthPercent="25%" />
 
     </android.support.percent.PercentRelativeLayout>
@@ -103,7 +124,7 @@
         android:layout_gravity="bottom"
         android:background="@color/grey"
         android:visibility="invisible"
-        app:layout_heightPercent="15%"
+        app:layout_heightPercent="10%"
         app:layout_widthPercent="100%">
 
         <ImageView

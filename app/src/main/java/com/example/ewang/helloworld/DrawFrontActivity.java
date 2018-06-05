@@ -29,7 +29,8 @@ import android.widget.Toast;
 import com.example.ewang.helloworld.constants.PaintGraphics;
 import com.example.ewang.helloworld.constants.PaintStatus;
 import com.example.ewang.helloworld.helper.MyApplication;
-import com.example.ewang.helloworld.helper.PopWindowHelper;
+import com.example.ewang.helloworld.helper.PopupDrawToolWindowHelper;
+import com.example.ewang.helloworld.helper.PopupPencilWindowHelper;
 import com.example.ewang.helloworld.service.BaseActivity;
 import com.example.ewang.helloworld.view.BaseCanvasView;
 import com.example.ewang.helloworld.view.ChildDrawView;
@@ -44,7 +45,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
     PercentRelativeLayout topDrawLayout;
     private BaseCanvasView topView;
 
-    private PopWindowHelper popWindowHelper;
+    private PopupPencilWindowHelper popupPencilWindowHelper;
 
     PencilView pencilView;
 
@@ -76,7 +77,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draw_front);
         canvasLayout = findViewById(R.id.layout_view_canvas);
-        topDrawLayout = findViewById(R.id.layout_top_draw_area);
+        topDrawLayout = findViewById(R.id.layout_center_draw_area);
         setCanvasSize();
 
         basicDrawBar = findViewById(R.id.layout_basic_bar);
@@ -121,134 +122,51 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
             case R.id.image_menu_pencil:
                 doScale();
                 pencilView = new PencilView(this);
-                popWindowHelper = new PopWindowHelper(pencilView, DrawFrontActivity.this);
+                PopupDrawToolWindowHelper popupDrawToolWindowHelper = new PopupDrawToolWindowHelper(this,
+                        pencilView, v, DrawFrontActivity.this);
+                popupDrawToolWindowHelper.setOnCancelClick((a) -> {
+                    doScale();
+                    canvasLayout.removeView(pencilView);
+                    popupDrawToolWindowHelper.dismissDrawTool();
+                    return null;
+                });
+                popupDrawToolWindowHelper.setOnDoneClick((a) -> {
+                    doScale();
+                    ChildDrawView childDrawView = new ChildDrawView(DrawFrontActivity.this, pencilView);
+                    childDrawView.setOperationListener(new OperationListener() {
+                        @Override
+                        public void onDeleteClick() {
+                            childDrawView.setInEdit(false);
+                            canvasLayout.removeView(childDrawView);
+                        }
+
+                        @Override
+                        public void onEdit(BaseCanvasView canvasView) {
+                            setTopView(canvasView);
+                            canvasLayout.bringChildToFront(canvasView);
+                        }
+
+                        @Override
+                        public void onReeditClick() {
+                            doScale();
+                            canvasLayout.addView(childDrawView.getPencilView());
+                            popupDrawToolWindowHelper.popDrawTool();
+                            canvasLayout.removeView(childDrawView);
+                        }
+                    });
+
+                    canvasLayout.addView(childDrawView);
+                    setTopView(childDrawView);
+                    canvasLayout.removeView(pencilView);
+                    popupDrawToolWindowHelper.dismissDrawTool();
+                    return null;
+                });
                 canvasLayout.addView(pencilView);
-                basicDrawBar.setVisibility(View.INVISIBLE);
-                pencilDrawBar.setVisibility(View.VISIBLE);
-                pencil.setColorFilter(R.color.pink);
-                eraser.setColorFilter(null);
-                shape.setColorFilter(null);
-                break;
-            case R.id.image_draw_pencil:
-                pencil.setColorFilter(R.color.pink);
-                eraser.setColorFilter(null);
-                shape.setColorFilter(null);
-                if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_PENCIL) {
-                    setBackgroundWindowDim();
-                    popWindowHelper.showPencilStyle(this, v, getOnDismissListener());
-                } else {
-                    pencilView.setPencilStyle(false, PaintStatus.IN_PENCIL,
-                            pencilView.getCurrentPencilSize(), pencilView.getCurrentPencilAlpha(), PaintGraphics.DRAW_LINE);
-                    pencilView.setCurrentPaintStatus(PaintStatus.IN_PENCIL);
-                }
-                break;
-            case R.id.image_draw_eraser:
-                eraser.setColorFilter(R.color.pink);
-                pencil.setColorFilter(null);
-                shape.setColorFilter(null);
-                if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_ERASER) {
-                    setBackgroundWindowDim();
-                    popWindowHelper.showPencilStyle(this, v, getOnDismissListener());
-                } else {
-                    pencilView.setPencilStyle(false, PaintStatus.IN_ERASER,
-                            pencilView.getCurrentEraserSize(), 0, PaintGraphics.DRAW_LINE);
-                    pencilView.setCurrentPaintStatus(PaintStatus.IN_ERASER);
-                }
-                break;
-            case R.id.image_draw_cancel:
-                doScale();
-                canvasLayout.removeView(pencilView);
-                pencilDrawBar.setVisibility(View.INVISIBLE);
-                basicDrawBar.setVisibility(View.VISIBLE);
-                break;
-            case R.id.image_draw_done:
-                doScale();
-                ChildDrawView childDrawView = new ChildDrawView(DrawFrontActivity.this, pencilView);
-                childDrawView.setOperationListener(new OperationListener() {
-                    @Override
-                    public void onDeleteClick() {
-                        childDrawView.setInEdit(false);
-                        canvasLayout.removeView(childDrawView);
-                    }
-
-                    @Override
-                    public void onEdit(BaseCanvasView canvasView) {
-                        setTopView(canvasView);
-                        canvasLayout.bringChildToFront(canvasView);
-                    }
-
-                    @Override
-                    public void onReeditClick() {
-                        doScale();
-                        popWindowHelper = new PopWindowHelper(childDrawView.getPencilView(), DrawFrontActivity.this);
-                        canvasLayout.addView(childDrawView.getPencilView());
-                        basicDrawBar.setVisibility(View.INVISIBLE);
-                        pencilDrawBar.setVisibility(View.VISIBLE);
-                        pencil.setColorFilter(R.color.pink);
-                        canvasLayout.removeView(childDrawView);
-                    }
-                });
-
-                canvasLayout.addView(childDrawView);
-                setTopView(childDrawView);
-                canvasLayout.removeView(pencilView);
-                pencilDrawBar.setVisibility(View.INVISIBLE);
-                basicDrawBar.setVisibility(View.VISIBLE);
-                break;
-            case R.id.image_draw_undo:
-                pencilView.undo();
-                break;
-            case R.id.image_draw_recover:
-                pencilView.recover();
-                break;
-            case R.id.image_draw_color:
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                alertDialogBuilder.setTitle("选择画笔颜色：");
-                alertDialogBuilder.setSingleChoiceItems(R.array.paintColor, pencilView.getCurrentColor().getIndex(), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        pencilView.setPaintColor(which);
-                        dialog.dismiss();
-                    }
-                });
-                alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                alertDialogBuilder.create().show();
-                break;
-            case R.id.image_draw_shape:
-                pencilView.setCurrentPaintStatus(PaintStatus.IN_SHAPE);
-                shape.setColorFilter(R.color.pink);
-                pencil.setColorFilter(null);
-                eraser.setColorFilter(null);
-                setBackgroundWindowDim();
-                popWindowHelper.showPencilStyle(this, v, getOnDismissListener());
+                popupDrawToolWindowHelper.popDrawTool();
                 break;
             default:
                 break;
         }
-    }
-
-    void setBackgroundWindowDim() {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.alpha = 0.5f;
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        getWindow().setAttributes(lp);
-    }
-
-    PopupWindow.OnDismissListener getOnDismissListener() {
-        return new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                WindowManager.LayoutParams lp = getWindow().getAttributes();
-                lp.alpha = 1.0f;
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                getWindow().setAttributes(lp);
-            }
-        };
     }
 
     void doScale() {
@@ -257,8 +175,8 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         if (scaleStatus == IN_NORMAL) {
             startX = 1.0f;
             startY = 1.0f;
-            scaleX = topDrawLayout.getWidth() * 0.9f / MyApplication.getCanvasWidth();
-            scaleY = topDrawLayout.getHeight() * 0.9f / MyApplication.getCanvasHeight();
+            scaleX = topDrawLayout.getWidth() * 0.95f / MyApplication.getCanvasWidth();
+            scaleY = topDrawLayout.getHeight() * 0.95f / MyApplication.getCanvasHeight();
 
             scaleStatus = IN_LARGE;
         } else {

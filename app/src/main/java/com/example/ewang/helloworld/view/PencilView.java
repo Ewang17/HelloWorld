@@ -174,7 +174,7 @@ public class PencilView extends View {
 
     private void initPencilStyle() {
         mainPaint = new Paint();
-        if (currentShapeStyle == ShapeStyle.PAINT_FILL) {
+        if (currentShapeStyle == ShapeStyle.PAINT_FILL && currentPaintStatus == PaintStatus.IN_SHAPE) {
             mainPaint.setStyle(Paint.Style.FILL);
         } else {
             mainPaint.setStyle(Paint.Style.STROKE);
@@ -192,7 +192,7 @@ public class PencilView extends View {
 
     private void initEraserStyle() {
         mainPaint = new Paint();
-        if (currentShapeStyle == ShapeStyle.PAINT_FILL) {
+        if (currentShapeStyle == ShapeStyle.PAINT_FILL && currentPaintStatus == PaintStatus.IN_SHAPE) {
             mainPaint.setStyle(Paint.Style.FILL);
         } else {
             mainPaint.setStyle(Paint.Style.STROKE);
@@ -209,9 +209,9 @@ public class PencilView extends View {
         mainPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
     }
 
-    public void setPencilStyle(boolean reset, PaintStatus currentPencilStatus, int size, int alpha, PaintGraphics paintGraphics) {
+    public void setPencilStyle(boolean reset, int size, int alpha, PaintGraphics paintGraphics) {
         currentPaintGraphics = paintGraphics;
-        if (currentPencilStatus == PaintStatus.IN_ERASER) {
+        if (currentPaintStatus == PaintStatus.IN_ERASER) {
             currentEraserSize = reset ? 20 : size;
             initEraserStyle();
         } else {

@@ -8,4 +8,15 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="translate_bottom">
+        <item name="android:windowEnterAnimation">@anim/translate_bottom_in</item>
+        <item name="android:windowExitAnimation">@anim/translate_bottom_out</item>
+    </style>
+
+    <style name="translate_top">
+        <item name="android:windowEnterAnimation">@anim/translate_top_in</item>
+        <item name="android:windowExitAnimation">@anim/translate_top_out</item>
+    </style>
+
+
 </resources>

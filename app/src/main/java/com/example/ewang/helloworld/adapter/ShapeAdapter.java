@@ -8,9 +8,8 @@ import android.widget.ImageView;
 
 import com.example.ewang.helloworld.R;
 import com.example.ewang.helloworld.constants.PaintGraphics;
-import com.example.ewang.helloworld.helper.PopWindowHelper;
+import com.example.ewang.helloworld.helper.PopupPencilWindowHelper;
 import com.example.ewang.helloworld.model.client.Shape;
-import com.example.ewang.helloworld.view.PencilView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
 
 public class ShapeAdapter extends RecyclerView.Adapter<ShapeAdapter.ViewHolder> {
     private List<Shape> shapeList;
-    PopWindowHelper popWindowHelper;
+    PopupPencilWindowHelper popupPencilWindowHelper;
     private List<ViewHolder> viewHolderList;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -36,9 +35,9 @@ public class ShapeAdapter extends RecyclerView.Adapter<ShapeAdapter.ViewHolder> 
         }
     }
 
-    public ShapeAdapter(List<Shape> shapeList, PopWindowHelper popWindowHelper) {
+    public ShapeAdapter(List<Shape> shapeList, PopupPencilWindowHelper popupPencilWindowHelper) {
         this.shapeList = shapeList;
-        this.popWindowHelper = popWindowHelper;
+        this.popupPencilWindowHelper = popupPencilWindowHelper;
         viewHolderList = new ArrayList<>();
     }
 
@@ -53,13 +52,13 @@ public class ShapeAdapter extends RecyclerView.Adapter<ShapeAdapter.ViewHolder> 
                 int position = holder.getAdapterPosition();
                 Shape shape = shapeList.get(position);
                 if (shape.getShapeId() == PaintGraphics.DRAW_CIRCLE.getValue()) {
-                    popWindowHelper.setCurrentPaintGraphics(PaintGraphics.DRAW_CIRCLE);
+                    popupPencilWindowHelper.setCurrentPaintGraphics(PaintGraphics.DRAW_CIRCLE);
                 } else if (shape.getShapeId() == PaintGraphics.DRAW_RECTANGLE.getValue()) {
-                    popWindowHelper.setCurrentPaintGraphics(PaintGraphics.DRAW_RECTANGLE);
+                    popupPencilWindowHelper.setCurrentPaintGraphics(PaintGraphics.DRAW_RECTANGLE);
                 } else if (shape.getShapeId() == PaintGraphics.DRAW_ARROW.getValue()) {
-                    popWindowHelper.setCurrentPaintGraphics(PaintGraphics.DRAW_ARROW);
+                    popupPencilWindowHelper.setCurrentPaintGraphics(PaintGraphics.DRAW_ARROW);
                 } else if (shape.getShapeId() == PaintGraphics.DRAW_TRIANGLE.getValue()) {
-                    popWindowHelper.setCurrentPaintGraphics(PaintGraphics.DRAW_TRIANGLE);
+                    popupPencilWindowHelper.setCurrentPaintGraphics(PaintGraphics.DRAW_TRIANGLE);
                 }
             }
         });
@@ -70,7 +69,7 @@ public class ShapeAdapter extends RecyclerView.Adapter<ShapeAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position) {
         Shape shape = shapeList.get(position);
         holder.shapeImage.setImageResource(shape.getShapeImage());
-        if (popWindowHelper.getCurrentPaintGraphics().getValue() == shape.getShapeId()) {
+        if (popupPencilWindowHelper.getCurrentPaintGraphics().getValue() == shape.getShapeId()) {
             holder.shapeView.setBackgroundColor(holder.shapeView.getResources().getColor(R.color.pink));
         }
     }

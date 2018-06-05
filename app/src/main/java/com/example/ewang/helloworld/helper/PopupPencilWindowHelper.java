@@ -30,7 +30,7 @@ import java.util.List;
  * Created by ewang on 2018/6/2.
  */
 
-public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class PopupPencilWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     private Context context;
 
@@ -47,18 +47,19 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
 
     private PaintGraphics currentPaintGraphics = PaintGraphics.DRAW_LINE;
 
-    public PopWindowHelper(PencilView pencilView, Context context) {
+    public PopupPencilWindowHelper(PencilView pencilView, Context context) {
         this.pencilView = pencilView;
         this.context = context;
     }
 
-    public void showPencilStyle(Context context, View parentView, PopupWindow.OnDismissListener onDismissListener) {
+    public void showPencilStyle(View parentView, PopupWindow.OnDismissListener onDismissListener) {
         View winContentView = LayoutInflater.from(context).inflate(
-                R.layout.activity_pencil_style, null);
+                R.layout.popup_window_pencil_style, null);
         pencil_window = new PopupWindow(winContentView, (int) (MyApplication.getScreenWidth() * 0.8),
                 (int) (MyApplication.getScreenHeight() * 0.6), true);
         pencil_window.setOnDismissListener(onDismissListener);
         initPencilPopWinListener(winContentView);
+        currentPaintGraphics = PaintGraphics.DRAW_LINE;
         pencil_window.showAtLocation(parentView, Gravity.CENTER, 0, 0);
 
     }
@@ -155,11 +156,11 @@ public class PopWindowHelper implements View.OnClickListener, SeekBar.OnSeekBarC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset:
-                pencilView.setPencilStyle(true, pencilView.getCurrentPaintStatus(), 0, 0, currentPaintGraphics);
+                pencilView.setPencilStyle(true, 0, 0, currentPaintGraphics);
                 break;
             case R.id.popbtn_sure:
-                pencilView.setPencilStyle(false, pencilView.getCurrentPaintStatus(),
-                        seekBar1.getProgress() * 2, (seekBar2.getProgress() * 255 / 100), currentPaintGraphics);
+                pencilView.setPencilStyle(false, seekBar1.getProgress() * 2,
+                        (seekBar2.getProgress() * 255 / 100), currentPaintGraphics);
                 pencil_window.dismiss();
                 break;
             case R.id.popbtn_cancel:

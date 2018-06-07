@@ -4,7 +4,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.ContentUris;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -14,23 +13,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.percent.PercentFrameLayout;
 import android.support.percent.PercentRelativeLayout;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
-import com.example.ewang.helloworld.constants.PaintGraphics;
-import com.example.ewang.helloworld.constants.PaintStatus;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.PopupDrawToolWindowHelper;
 import com.example.ewang.helloworld.helper.PopupPencilWindowHelper;
+import com.example.ewang.helloworld.helper.TextViewHelper;
 import com.example.ewang.helloworld.service.BaseActivity;
 import com.example.ewang.helloworld.view.BaseCanvasView;
 import com.example.ewang.helloworld.view.ChildDrawView;
@@ -41,6 +37,7 @@ import com.example.ewang.helloworld.view.OperationListener;
 
 public class DrawFrontActivity extends BaseActivity implements View.OnClickListener {
 
+    PercentFrameLayout layoutWhole;
     FrameLayout canvasLayout;
     PercentRelativeLayout topDrawLayout;
     private BaseCanvasView topView;
@@ -77,6 +74,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draw_front);
         canvasLayout = findViewById(R.id.layout_view_canvas);
+        layoutWhole = findViewById(R.id.layout_draw_whole);
         topDrawLayout = findViewById(R.id.layout_center_draw_area);
         setCanvasSize();
 
@@ -164,6 +162,18 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 canvasLayout.addView(pencilView);
                 popupDrawToolWindowHelper.popDrawTool();
                 break;
+            case R.id.image_menu_text:
+                TextViewHelper textViewHelper = new TextViewHelper(this, v, DrawFrontActivity.this);
+                View addTextView = textViewHelper.getMainView();
+                textViewHelper.setOnCancelClick((a) -> {
+                    layoutWhole.removeView(addTextView);
+                    return null;
+                });
+
+                textViewHelper.setOnDoneClick((a) -> {
+                    return null;
+                });
+                layoutWhole.addView(addTextView);
             default:
                 break;
         }

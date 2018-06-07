@@ -15,6 +15,7 @@ import android.widget.PopupWindow;
 import com.example.ewang.helloworld.R;
 import com.example.ewang.helloworld.constants.PaintGraphics;
 import com.example.ewang.helloworld.constants.PaintStatus;
+import com.example.ewang.helloworld.view.ColorPickerDialog;
 import com.example.ewang.helloworld.view.PencilView;
 
 import java.util.function.Function;
@@ -141,22 +142,16 @@ public class PopupDrawToolWindowHelper implements View.OnClickListener {
                 popupPencilWindowHelper.showPencilStyle(parentView, getOnDismissListener());
                 break;
             case R.id.image_draw_color:
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(parentActivity);
-                alertDialogBuilder.setTitle("选择画笔颜色：");
-                alertDialogBuilder.setSingleChoiceItems(R.array.paintColor, pencilView.getCurrentColor().getIndex(), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        pencilView.setPaintColor(which);
-                        dialog.dismiss();
-                    }
-                });
-                alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                alertDialogBuilder.create().show();
+                ColorPickerDialog dialog = new ColorPickerDialog(parentActivity, pencilView.getCurrentColorValue(),
+                        "ColorPicker",
+                        new ColorPickerDialog.OnColorChangedListener() {
+
+                            @Override
+                            public void colorChanged(int color) {
+                                pencilView.setCurrentColorValue(color);
+                            }
+                        });
+                dialog.show();
                 break;
             case R.id.image_draw_cancel:
                 onCancelClick.apply(pencil);

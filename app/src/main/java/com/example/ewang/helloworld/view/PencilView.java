@@ -12,7 +12,6 @@ import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.ewang.helloworld.constants.PaintColor;
 import com.example.ewang.helloworld.constants.PaintGraphics;
 import com.example.ewang.helloworld.constants.PaintStatus;
 import com.example.ewang.helloworld.constants.ShapeStyle;
@@ -58,7 +57,7 @@ public class PencilView extends View {
 
     private int currentPencilAlpha = 255;
 
-    private PaintColor currentColor = PaintColor.fromIndex(0);
+    private int currentColorValue = Color.parseColor("#000000");
 
     private ShapeStyle currentShapeStyle = ShapeStyle.PAINT_STROKE;
 
@@ -183,7 +182,8 @@ public class PencilView extends View {
         mainPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
         mainPaint.setAntiAlias(true);
         mainPaint.setDither(true);
-        mainPaint.setColor(currentColor.getValue());
+        //mainPaint.setColor(currentColor.getValue());
+        mainPaint.setColor(currentColorValue);
 
         //手动设置画笔样式
         mainPaint.setAlpha(currentPencilAlpha);
@@ -219,11 +219,6 @@ public class PencilView extends View {
             currentPencilAlpha = reset ? 255 : alpha;
             initPencilStyle();
         }
-    }
-
-    public void setPaintColor(int colorIndex) {
-        currentColor = PaintColor.fromIndex(colorIndex);
-        initPencilStyle();
     }
 
     /**
@@ -319,10 +314,6 @@ public class PencilView extends View {
         return tempCanvas;
     }
 
-    public PaintColor getCurrentColor() {
-        return currentColor;
-    }
-
     public void setCurrentShapeStyle(ShapeStyle currentShapeStyle) {
         this.currentShapeStyle = currentShapeStyle;
     }
@@ -333,5 +324,14 @@ public class PencilView extends View {
 
     public PaintGraphics getCurrentPaintGraphics() {
         return currentPaintGraphics;
+    }
+
+    public void setCurrentColorValue(int currentColorValue) {
+        this.currentColorValue = currentColorValue;
+        initPencilStyle();
+    }
+
+    public int getCurrentColorValue() {
+        return currentColorValue;
     }
 }

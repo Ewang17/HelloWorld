@@ -21,4 +21,20 @@ public class SizeHelper {
         return (int) (pxValue / scale + 0.5f);
     }
 
+    /**
+     * sp转换成px
+     */
+    public static int sp2px(float spValue) {
+        float fontScale = MyApplication.getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
+    }
+
+    /**
+     * px转换成sp
+     */
+    public static int px2sp(float pxValue) {
+        float fontScale = MyApplication.getDisplayMetrics().scaledDensity;
+        return (int) (pxValue / fontScale + 0.5f);
+    }
+
 }

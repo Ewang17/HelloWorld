@@ -44,12 +44,10 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
     PercentRelativeLayout topDrawLayout;
     private BaseCanvasView topView;
 
-    private PopupPencilWindowHelper popupPencilWindowHelper;
 
     PencilView pencilView;
 
     PercentRelativeLayout basicDrawBar;
-    PercentRelativeLayout pencilDrawBar;
 
     public static final int CHOOSE_PHOTO = 2;
 
@@ -81,7 +79,6 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         setCanvasSize();
 
         basicDrawBar = findViewById(R.id.layout_basic_bar);
-        pencilDrawBar = findViewById(R.id.layout_pencil_bar);
 
         pencil = findViewById(R.id.image_draw_pencil);
         eraser = findViewById(R.id.image_draw_eraser);
@@ -99,15 +96,6 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         addPhoto.setOnClickListener(this);
         addPencil.setOnClickListener(this);
         addText.setOnClickListener(this);
-
-        pencil.setOnClickListener(this);
-        eraser.setOnClickListener(this);
-        cancel.setOnClickListener(this);
-        done.setOnClickListener(this);
-        undo.setOnClickListener(this);
-        recover.setOnClickListener(this);
-        color.setOnClickListener(this);
-        shape.setOnClickListener(this);
 
     }
 
@@ -128,6 +116,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                     doScale();
                     canvasLayout.removeView(pencilView);
                     popupDrawToolWindowHelper.dismissDrawTool();
+                    basicDrawBar.setVisibility(View.VISIBLE);
                     return null;
                 });
                 popupDrawToolWindowHelper.setOnDoneClick((a) -> {
@@ -154,21 +143,23 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                             canvasLayout.removeView(childDrawView);
                         }
                     });
-
                     canvasLayout.addView(childDrawView);
                     setTopView(childDrawView);
                     canvasLayout.removeView(pencilView);
                     popupDrawToolWindowHelper.dismissDrawTool();
+                    basicDrawBar.setVisibility(View.VISIBLE);
                     return null;
                 });
                 canvasLayout.addView(pencilView);
                 popupDrawToolWindowHelper.popDrawTool();
+                basicDrawBar.setVisibility(View.GONE);
                 break;
             case R.id.image_menu_text:
                 TextViewHelper textViewHelper = new TextViewHelper(DrawFrontActivity.this);
                 View addTextView = textViewHelper.getMainView();
                 textViewHelper.setOnCancelClick((a) -> {
                     layoutWhole.removeView(addTextView);
+                    basicDrawBar.setVisibility(View.VISIBLE);
                     return null;
                 });
 
@@ -196,9 +187,11 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                     setTopView(childPhotoView);
 
                     layoutWhole.removeView(addTextView);
+                    basicDrawBar.setVisibility(View.VISIBLE);
                     return null;
                 });
                 layoutWhole.addView(addTextView);
+                basicDrawBar.setVisibility(View.GONE);
             default:
                 break;
         }

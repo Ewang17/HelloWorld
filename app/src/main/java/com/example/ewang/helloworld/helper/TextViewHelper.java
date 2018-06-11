@@ -294,7 +294,7 @@ public class TextViewHelper implements View.OnClickListener {
         float trySize = textPaintClone.getTextSize();
 
         while (textPaintClone.measureText(text) < availableWidth) {
-            if (text.length() < 2) {
+            if (text.length() <= 2) {
                 break;
             }
             trySize++;

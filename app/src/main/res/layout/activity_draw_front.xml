@@ -2,10 +2,10 @@
 <android.support.percent.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_draw_whole"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/layout_draw_whole"
     tools:context="com.example.ewang.helloworld.DrawFrontActivity">
 
     <android.support.percent.PercentRelativeLayout
@@ -45,7 +45,6 @@
             android:scaleType="centerInside"
             android:src="@drawable/tshirt_front_pic" />
 
-        <!--TODO 绘制区域及缩放问题-->
         <FrameLayout
             android:id="@+id/layout_view_canvas"
             android:layout_centerInParent="true"
@@ -119,88 +118,5 @@
             app:layout_widthPercent="25%" />
 
     </android.support.percent.PercentRelativeLayout>
-
-    <android.support.percent.PercentRelativeLayout
-        android:id="@+id/layout_pencil_bar"
-        android:layout_gravity="bottom"
-        android:background="@color/grey"
-        android:visibility="invisible"
-        app:layout_heightPercent="10%"
-        app:layout_widthPercent="100%">
-
-        <ImageView
-            android:id="@+id/image_draw_cancel"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/cancel"
-            app:layout_heightPercent="40%"
-            app:layout_widthPercent="25%" />
-
-        <ImageView
-            android:id="@+id/image_draw_undo"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@id/image_draw_cancel"
-            android:src="@drawable/undo"
-            app:layout_heightPercent="40%"
-            app:layout_widthPercent="25%" />
-
-        <ImageView
-            android:id="@+id/image_draw_recover"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@id/image_draw_done"
-            android:src="@drawable/recover"
-            app:layout_heightPercent="40%"
-            app:layout_widthPercent="25%" />
-
-        <ImageView
-            android:id="@+id/image_draw_done"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/next"
-            app:layout_heightPercent="40%"
-            app:layout_widthPercent="25%" />
-
-        <ImageView
-            android:id="@+id/image_draw_pencil"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:src="@drawable/ic_draw_white"
-            app:layout_heightPercent="60%"
-            app:layout_widthPercent="25%" />
-
-        <ImageView
-            android:id="@+id/image_draw_eraser"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/image_draw_pencil"
-            android:src="@drawable/ic_menu_eraser"
-            app:layout_heightPercent="60%"
-            app:layout_widthPercent="25%" />
-
-        <ImageView
-            android:id="@+id/image_draw_shape"
-            android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@id/layout_draw_color"
-            android:src="@drawable/ic_menu_add_shape"
-            app:layout_heightPercent="60%"
-            app:layout_widthPercent="25%" />
-
-        <RelativeLayout
-            android:id="@+id/layout_draw_color"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            app:layout_heightPercent="60%"
-            app:layout_widthPercent="25%">
-
-            <ImageView
-                android:id="@+id/image_draw_color"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:src="@drawable/color" />
-        </RelativeLayout>
-
-
-    </android.support.percent.PercentRelativeLayout>
-
 
 </android.support.percent.PercentFrameLayout>

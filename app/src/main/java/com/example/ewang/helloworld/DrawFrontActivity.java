@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -163,14 +165,37 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 popupDrawToolWindowHelper.popDrawTool();
                 break;
             case R.id.image_menu_text:
-                TextViewHelper textViewHelper = new TextViewHelper(this, v, DrawFrontActivity.this);
+                TextViewHelper textViewHelper = new TextViewHelper(DrawFrontActivity.this);
                 View addTextView = textViewHelper.getMainView();
                 textViewHelper.setOnCancelClick((a) -> {
                     layoutWhole.removeView(addTextView);
                     return null;
                 });
 
-                textViewHelper.setOnDoneClick((a) -> {
+                textViewHelper.setOnDoneClick((bitmap) -> {
+                    ChildPhotoView childPhotoView = new ChildPhotoView(DrawFrontActivity.this, (Bitmap) bitmap);
+                    childPhotoView.setOperationListener(new OperationListener() {
+                        @Override
+                        public void onDeleteClick() {
+                            childPhotoView.setInEdit(false);
+                            canvasLayout.removeView(childPhotoView);
+                        }
+
+                        @Override
+                        public void onEdit(BaseCanvasView canvasView) {
+                            setTopView(canvasView);
+                            canvasLayout.bringChildToFront(canvasView);
+                        }
+
+                        @Override
+                        public void onReeditClick() {
+
+                        }
+                    });
+                    canvasLayout.addView(childPhotoView);
+                    setTopView(childPhotoView);
+
+                    layoutWhole.removeView(addTextView);
                     return null;
                 });
                 layoutWhole.addView(addTextView);

@@ -4,7 +4,8 @@
     android:id="@+id/constraintLayoutAddText"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:focusableInTouchMode="true">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButtonDone"
@@ -82,7 +83,7 @@
         android:ems="10"
         android:gravity="center"
         android:inputType="textPersonName"
-        android:textSize="200sp"
+        android:textSize="220sp"
         app:layout_constraintBottom_toTopOf="@+id/imageViewColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

@@ -52,11 +52,9 @@ public class TextViewHelper implements View.OnClickListener {
 
     private ColorPickerHorizontalView colorPickerHorizontalView;
 
-    private boolean isInColorPicker, isInTypeFace;
+    private boolean inKeyboard, inColorPicker, inTypeFace;
 
     private ConstraintLayout constraintLayout;
-
-    private int scrollHeight;
 
     private InputMethodManager imm;
 
@@ -100,7 +98,6 @@ public class TextViewHelper implements View.OnClickListener {
         editTextContent.setFocusable(true);
         editTextContent.setFocusableInTouchMode(true);
         editTextContent.requestFocus();
-        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
 
@@ -108,60 +105,62 @@ public class TextViewHelper implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imageViewKeyboard:
-                isInTypeFace = false;
-                isInColorPicker = false;
+                inTypeFace = false;
+                inColorPicker = false;
                 bottomToolLayout.removeAllViews();
-                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                if (inKeyboard) {
+                    editTextContent.clearFocus();
+                } else {
+                    editTextContent.requestFocus();
+                }
                 break;
             case R.id.imageViewColor:
-                isInTypeFace = false;
+                inTypeFace = false;
+                if (inKeyboard || editTextContent.hasFocus() || imm.isActive()) {
+                    editTextContent.clearFocus();
+                }
                 bottomToolLayout.removeAllViews();
-                if (imm.isActive()) {
-                    imm.hideSoftInputFromWindow(editTextContent.getWindowToken(), 0);
+
+                if (inColorPicker) {
+                    inColorPicker = false;
+                } else {
+                    colorPickerHorizontalView = new ColorPickerHorizontalView(bottomToolLayout.getContext(),
+                            MyApplication.getScreenWidth() * 9 / 16, MyApplication.getScreenWidth(),
+                            editTextContent.getTextColors().getDefaultColor(), new ColorPickerHorizontalView.OnColorChangedListener() {
+                        @Override
+                        public void colorChanged(int color) {
+                            editTextContent.setTextColor(color);
+                        }
+                    });
+                    bottomToolLayout.addView(colorPickerHorizontalView);
+                    bottomToolLayout.setVisibility(View.VISIBLE);
+                    inColorPicker = true;
                 }
-                if (isInColorPicker) {
-                    bottomToolLayout.setVisibility(View.GONE);
-                    isInColorPicker = false;
-                    return;
-                }
-                bottomToolLayout.getLayoutParams().height = 0;
-                colorPickerHorizontalView = new ColorPickerHorizontalView(bottomToolLayout.getContext(),
-                        MyApplication.getScreenWidth() * 9 / 16, MyApplication.getScreenWidth(),
-                        editTextContent.getTextColors().getDefaultColor(), new ColorPickerHorizontalView.OnColorChangedListener() {
-                    @Override
-                    public void colorChanged(int color) {
-                        editTextContent.setTextColor(color);
-                    }
-                });
-                bottomToolLayout.addView(colorPickerHorizontalView);
-                bottomToolLayout.setVisibility(View.VISIBLE);
-                isInColorPicker = true;
                 break;
             case R.id.imageViewType:
-                isInColorPicker = false;
+                inColorPicker = false;
+                if (inKeyboard || editTextContent.hasFocus() || imm.isActive()) {
+                    editTextContent.clearFocus();
+                }
                 bottomToolLayout.removeAllViews();
-                if (imm.isActive()) {
-                    imm.hideSoftInputFromWindow(editTextContent.getWindowToken(), 0);
+
+                if (inTypeFace) {
+                    inTypeFace = false;
+                } else {
+                    initTypeFace();
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 2);
+                    gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                        @Override
+                        public int getSpanSize(int position) {
+                            return setSpanSize(position, typeFaceList);
+                        }
+                    });
+                    typeFaceRecyclerView.setLayoutManager(gridLayoutManager);
+                    typeFaceRecyclerView.setAdapter(new TypeFaceAdapter(typeFaceList, editTextContent));
+                    bottomToolLayout.addView(typeFaceRecyclerView);
+                    bottomToolLayout.setVisibility(View.VISIBLE);
+                    inTypeFace = true;
                 }
-                if (isInTypeFace) {
-                    bottomToolLayout.setVisibility(View.GONE);
-                    isInTypeFace = false;
-                    return;
-                }
-                bottomToolLayout.getLayoutParams().height = 0;
-                initTypeFace();
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 2);
-                gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                    @Override
-                    public int getSpanSize(int position) {
-                        return setSpanSize(position, typeFaceList);
-                    }
-                });
-                typeFaceRecyclerView.setLayoutManager(gridLayoutManager);
-                typeFaceRecyclerView.setAdapter(new TypeFaceAdapter(typeFaceList, editTextContent));
-                bottomToolLayout.addView(typeFaceRecyclerView);
-                bottomToolLayout.setVisibility(View.VISIBLE);
-                isInTypeFace = true;
                 break;
             case R.id.floatingActionButtonCancel:
                 onCancelClick.apply(null);
@@ -205,22 +204,37 @@ public class TextViewHelper implements View.OnClickListener {
                 adjustTvTextSize(editTextContent, editTextContent.getWidth(), current);
             }
         });
+
+        editTextContent.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    inKeyboard = true;
+                    inColorPicker = false;
+                    inTypeFace = false;
+                    bottomToolLayout.removeAllViews();
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                } else {
+                    inKeyboard = false;
+                    imm.hideSoftInputFromWindow(editTextContent.getWindowToken(), 0);
+                    bottomToolLayout.getLayoutParams().height = 0;
+                    bottomToolLayout.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     public void initLayoutListener() {
         constraintLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if (imm.isActive() && !isInColorPicker && !isInTypeFace) {
+                if (!inColorPicker && !inTypeFace) {
+
                     Rect rect = new Rect();
                     constraintLayout.getWindowVisibleDisplayFrame(rect);
-
-                    int[] location = new int[2];
-                    color.getLocationInWindow(location);
-                    scrollHeight = MyApplication.getScreenHeight() - rect.bottom;
-
-                    bottomToolLayout.getLayoutParams().height = scrollHeight;
-                    if (scrollHeight > 0) {
+                    int bottomLayoutHeight = MyApplication.getScreenHeight() - rect.bottom;
+                    bottomToolLayout.getLayoutParams().height = bottomLayoutHeight;
+                    if (bottomLayoutHeight > 0) {
                         bottomToolLayout.setVisibility(View.INVISIBLE);
                     } else {
                         bottomToolLayout.setVisibility(View.GONE);
@@ -268,9 +282,6 @@ public class TextViewHelper implements View.OnClickListener {
     }
 
     private void adjustTvTextSize(EditText editText, int maxWidth, String text) {
-        if (text.length() <= 2) {
-            return;
-        }
 
         int availableWidth = maxWidth - editText.getPaddingLeft() - editText.getPaddingRight() - 10;
 
@@ -283,6 +294,9 @@ public class TextViewHelper implements View.OnClickListener {
         float trySize = textPaintClone.getTextSize();
 
         while (textPaintClone.measureText(text) < availableWidth) {
+            if (text.length() < 2) {
+                break;
+            }
             trySize++;
             textPaintClone.setTextSize(trySize);
         }

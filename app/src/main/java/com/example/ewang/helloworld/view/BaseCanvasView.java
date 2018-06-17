@@ -15,6 +15,8 @@ import com.example.ewang.helloworld.R;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.RectHelper;
 
+import java.util.function.Function;
+
 /**
  * Created by ewang on 2018/6/1.
  */
@@ -70,6 +72,8 @@ public class BaseCanvasView extends View {
 
     protected OperationListener operationListener;
 
+    protected Function moveEvent, upEvent;
+
     protected Matrix matrix = new Matrix();
 
     public BaseCanvasView(Context context) {
@@ -117,6 +121,7 @@ public class BaseCanvasView extends View {
                     matrix.postScale(scale, scale, mid.x, mid.y);
                     invalidate();
                 } else if (inBitmap) {
+                    moveEvent.apply(handled);
                     float x = event.getX(0);
                     float y = event.getY(0);
                     matrix.postTranslate(x - lastX, y - lastY);
@@ -127,6 +132,7 @@ public class BaseCanvasView extends View {
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
+                upEvent.apply(handled);
                 inResize = false;
                 inBitmap = false;
                 break;
@@ -314,5 +320,11 @@ public class BaseCanvasView extends View {
         return event.getX(0) >= left && event.getX(0) <= right && event.getY(0) >= top && event.getY(0) <= bottom;
     }
 
+    public void setMoveEvent(Function moveEvent) {
+        this.moveEvent = moveEvent;
+    }
 
+    public void setUpEvent(Function upEvent) {
+        this.upEvent = upEvent;
+    }
 }

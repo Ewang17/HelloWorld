@@ -14,20 +14,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.percent.PercentFrameLayout;
-import android.support.percent.PercentRelativeLayout;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.ewang.helloworld.helper.DialogHelper;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.PopupDrawToolWindowHelper;
-import com.example.ewang.helloworld.helper.PopupPencilWindowHelper;
 import com.example.ewang.helloworld.helper.TextViewHelper;
 import com.example.ewang.helloworld.service.BaseActivity;
 import com.example.ewang.helloworld.view.BaseCanvasView;
@@ -39,26 +37,27 @@ import com.example.ewang.helloworld.view.OperationListener;
 
 public class DrawFrontActivity extends BaseActivity implements View.OnClickListener {
 
-    PercentFrameLayout layoutWhole;
+    ConstraintLayout layoutWhole;
     FrameLayout canvasLayout;
-    PercentRelativeLayout topDrawLayout;
+    ImageView drawBackground;
     private BaseCanvasView topView;
 
 
     PencilView pencilView;
-
-    PercentRelativeLayout basicDrawBar;
 
     public static final int CHOOSE_PHOTO = 2;
 
     final int IN_LARGE = 0;
     final int IN_NORMAL = 1;
     int scaleStatus = IN_NORMAL;
-    private float scaleX, scaleY;
+    private float scaleX, scaleY, transEndY;
 
     ImageView addPhoto;
+    ImageView addPic;
     ImageView addPencil;
     ImageView addText;
+    ImageView totalDone;
+    ImageView totalCancel;
 
     ImageView pencil;
     ImageView eraser;
@@ -72,13 +71,11 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_draw_front);
-        canvasLayout = findViewById(R.id.layout_view_canvas);
-        layoutWhole = findViewById(R.id.layout_draw_whole);
-        topDrawLayout = findViewById(R.id.layout_center_draw_area);
+        setContentView(R.layout.activity_draw_front_constraint);
+        canvasLayout = findViewById(R.id.framelayout_canvas);
+        layoutWhole = findViewById(R.id.constrant_layout_draw);
+        drawBackground = findViewById(R.id.image_view_background);
         setCanvasSize();
-
-        basicDrawBar = findViewById(R.id.layout_basic_bar);
 
         pencil = findViewById(R.id.image_draw_pencil);
         eraser = findViewById(R.id.image_draw_eraser);
@@ -89,25 +86,31 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         color = findViewById(R.id.image_draw_color);
         shape = findViewById(R.id.image_draw_shape);
 
-        addPhoto = findViewById(R.id.image_menu_add_photo);
-        addPencil = findViewById(R.id.image_menu_pencil);
-        addText = findViewById(R.id.image_menu_text);
+        addPhoto = findViewById(R.id.image_view_add_pic);
+        addPic = findViewById(R.id.image_view_add_inner_pic);
+        addPencil = findViewById(R.id.image_view_add_draw);
+        addText = findViewById(R.id.image_view_add_text);
+        totalDone = findViewById(R.id.image_view_done);
+        totalCancel = findViewById(R.id.image_view_cancel);
 
         addPhoto.setOnClickListener(this);
+        addPic.setOnClickListener(this);
         addPencil.setOnClickListener(this);
         addText.setOnClickListener(this);
+        totalDone.setOnClickListener(this);
+        totalCancel.setOnClickListener(this);
 
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.image_menu_add_photo:
+            case R.id.image_view_add_pic:
                 Intent picIntent = new Intent("android.intent.action.GET_CONTENT");
                 picIntent.setType("image/*");
                 startActivityForResult(picIntent, CHOOSE_PHOTO);
                 break;
-            case R.id.image_menu_pencil:
+            case R.id.image_view_add_draw:
                 doScale();
                 pencilView = new PencilView(this);
                 PopupDrawToolWindowHelper popupDrawToolWindowHelper = new PopupDrawToolWindowHelper(this,
@@ -116,7 +119,12 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                     doScale();
                     canvasLayout.removeView(pencilView);
                     popupDrawToolWindowHelper.dismissDrawTool();
-                    basicDrawBar.setVisibility(View.VISIBLE);
+
+                    addPhoto.setVisibility(View.VISIBLE);
+                    addPic.setVisibility(View.VISIBLE);
+                    addPencil.setVisibility(View.VISIBLE);
+                    addText.setVisibility(View.VISIBLE);
+
                     return null;
                 });
                 popupDrawToolWindowHelper.setOnDoneClick((a) -> {
@@ -147,19 +155,28 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                     setTopView(childDrawView);
                     canvasLayout.removeView(pencilView);
                     popupDrawToolWindowHelper.dismissDrawTool();
-                    basicDrawBar.setVisibility(View.VISIBLE);
+                    addPhoto.setVisibility(View.VISIBLE);
+                    addPic.setVisibility(View.VISIBLE);
+                    addPencil.setVisibility(View.VISIBLE);
+                    addText.setVisibility(View.VISIBLE);
                     return null;
                 });
                 canvasLayout.addView(pencilView);
                 popupDrawToolWindowHelper.popDrawTool();
-                basicDrawBar.setVisibility(View.GONE);
+                addPhoto.setVisibility(View.GONE);
+                addPic.setVisibility(View.GONE);
+                addPencil.setVisibility(View.GONE);
+                addText.setVisibility(View.GONE);
                 break;
-            case R.id.image_menu_text:
+            case R.id.image_view_add_text:
                 TextViewHelper textViewHelper = new TextViewHelper(DrawFrontActivity.this);
                 View addTextView = textViewHelper.getMainView();
                 textViewHelper.setOnCancelClick((a) -> {
                     layoutWhole.removeView(addTextView);
-                    basicDrawBar.setVisibility(View.VISIBLE);
+                    addPhoto.setVisibility(View.VISIBLE);
+                    addPic.setVisibility(View.VISIBLE);
+                    addPencil.setVisibility(View.VISIBLE);
+                    addText.setVisibility(View.VISIBLE);
                     return null;
                 });
 
@@ -187,11 +204,36 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                     setTopView(childPhotoView);
 
                     layoutWhole.removeView(addTextView);
-                    basicDrawBar.setVisibility(View.VISIBLE);
+                    addPhoto.setVisibility(View.VISIBLE);
+                    addPic.setVisibility(View.VISIBLE);
+                    addPencil.setVisibility(View.VISIBLE);
+                    addText.setVisibility(View.VISIBLE);
                     return null;
                 });
                 layoutWhole.addView(addTextView);
-                basicDrawBar.setVisibility(View.GONE);
+                addPhoto.setVisibility(View.GONE);
+                addPic.setVisibility(View.GONE);
+                addPencil.setVisibility(View.GONE);
+                addText.setVisibility(View.GONE);
+            case R.id.image_view_cancel:
+                DialogHelper.showAlertDialog(DrawFrontActivity.this, "提示", "确认不保存直接退出?",
+                        ((dialog, which) -> {
+                            finish();
+                        }), ((dialog, which) -> {
+
+                        }));
+                break;
+            case R.id.image_view_done:
+                DialogHelper.showAlertDialog(DrawFrontActivity.this, "提示", "保存后的作品将不能再被返回修改",
+                        ((dialog, which) -> {
+                            Bitmap bitmap = Bitmap.createBitmap(canvasLayout.getWidth(), canvasLayout.getHeight(), Bitmap.Config.ARGB_8888);
+                            Canvas canvas = new Canvas(bitmap);
+                            canvasLayout.draw(canvas);
+                            //TODO 上传图片
+                        }), ((dialog, which) -> {
+
+                        }));
+                break;
             default:
                 break;
         }
@@ -199,28 +241,38 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
 
     void doScale() {
         AnimatorSet animatorSet = new AnimatorSet();
-        float startX, startY;
+        float startX, startY, transStartY;
         if (scaleStatus == IN_NORMAL) {
             startX = 1.0f;
             startY = 1.0f;
-            scaleX = topDrawLayout.getWidth() * 0.95f / MyApplication.getCanvasWidth();
-            scaleY = topDrawLayout.getHeight() * 0.95f / MyApplication.getCanvasHeight();
+            transStartY = 0f;
+            scaleX = drawBackground.getWidth() * 0.95f / MyApplication.getCanvasWidth();
+            scaleY = drawBackground.getHeight() * 1f / MyApplication.getCanvasHeight();
+            transEndY = -(drawBackground.getHeight() - canvasLayout.getHeight()) / 4f / scaleY;
 
             scaleStatus = IN_LARGE;
         } else {
             startX = scaleX;
             startY = scaleY;
+            transStartY = transEndY;
 
             scaleX = 1.0f;
             scaleY = 1.0f;
+            transEndY = 0f;
 
             scaleStatus = IN_NORMAL;
         }
-        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(topDrawLayout, "scaleX", startX, scaleX);
-        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(topDrawLayout, "scaleY", startY, scaleY);
+        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(drawBackground, "scaleX", startX, scaleX);
+        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(drawBackground, "scaleY", startY, scaleY);
+        ObjectAnimator scaleXCanvasAnimator = ObjectAnimator.ofFloat(canvasLayout, "scaleX", startX, scaleX);
+        ObjectAnimator scaleYCanvasAnimator = ObjectAnimator.ofFloat(canvasLayout, "scaleY", startY, scaleY);
+        ObjectAnimator transYAnimator = ObjectAnimator.ofFloat(drawBackground, "translationY", transStartY, transEndY);
+        ObjectAnimator transYCanvasAnimator = ObjectAnimator.ofFloat(canvasLayout, "translationY", transStartY, transEndY);
         scaleXAnimator.setDuration(500);
         scaleYAnimator.setDuration(500);
-        animatorSet.playTogether(scaleXAnimator, scaleYAnimator);
+        scaleXCanvasAnimator.setDuration(500);
+        scaleYCanvasAnimator.setDuration(500);
+        animatorSet.playTogether(scaleXAnimator, scaleYAnimator, scaleXCanvasAnimator, scaleYCanvasAnimator, transYAnimator, transYCanvasAnimator);
         animatorSet.start();
         MyApplication.setCanvasWidth(canvasLayout.getWidth());
         MyApplication.setCanvasHeight(canvasLayout.getHeight());
@@ -341,6 +393,16 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
         }
         topView = canvasView;
         topView.setInEdit(true);
+        topView.setMoveEvent((a) -> {
+            canvasLayout.setBackground(getResources().getDrawable(R.drawable.shape_border, getTheme()));
+            layoutWhole.setAlpha(.8f);
+            return null;
+        });
+        topView.setUpEvent((a) -> {
+            canvasLayout.setBackground(null);
+            layoutWhole.setAlpha(1f);
+            return null;
+        });
     }
 
     void setCanvasSize() {

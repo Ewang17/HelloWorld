@@ -15,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -64,9 +65,9 @@ public class TextViewHelper implements View.OnClickListener {
 
     private Bitmap mainBitmap;
 
-    public TextViewHelper(Context context) {
+    public TextViewHelper(Context context, ViewGroup root) {
         this.context = context;
-        this.mainView = LayoutInflater.from(context).inflate(R.layout.activity_view_add_text, null);
+        this.mainView = LayoutInflater.from(context).inflate(R.layout.activity_view_add_text, root, false);
         imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 
         initViews();

@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
@@ -23,16 +24,23 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.ewang.helloworld.constants.SystemConstants;
 import com.example.ewang.helloworld.helper.DialogHelper;
 import com.example.ewang.helloworld.helper.MyApplication;
 import com.example.ewang.helloworld.helper.PopupDrawToolWindowHelper;
 import com.example.ewang.helloworld.helper.TextViewHelper;
 import com.example.ewang.helloworld.service.BaseActivity;
+import com.example.ewang.helloworld.service.UploadDesignService;
+import com.example.ewang.helloworld.service.UploadImageService;
 import com.example.ewang.helloworld.view.BaseCanvasView;
 import com.example.ewang.helloworld.view.ChildDrawView;
 import com.example.ewang.helloworld.view.PencilView;
 import com.example.ewang.helloworld.view.ChildPhotoView;
 import com.example.ewang.helloworld.view.OperationListener;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 
 public class DrawFrontActivity extends BaseActivity implements View.OnClickListener {
@@ -106,11 +114,17 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.image_view_add_pic:
+                if (topView != null) {
+                    topView.setInEdit(false);
+                }
                 Intent picIntent = new Intent("android.intent.action.GET_CONTENT");
                 picIntent.setType("image/*");
                 startActivityForResult(picIntent, CHOOSE_PHOTO);
                 break;
             case R.id.image_view_add_draw:
+                if (topView != null) {
+                    topView.setInEdit(false);
+                }
                 doScale();
                 pencilView = new PencilView(this);
                 PopupDrawToolWindowHelper popupDrawToolWindowHelper = new PopupDrawToolWindowHelper(this,
@@ -169,8 +183,12 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 addText.setVisibility(View.GONE);
                 break;
             case R.id.image_view_add_text:
-                TextViewHelper textViewHelper = new TextViewHelper(DrawFrontActivity.this);
+                if (topView != null) {
+                    topView.setInEdit(false);
+                }
+                TextViewHelper textViewHelper = new TextViewHelper(DrawFrontActivity.this, layoutWhole);
                 View addTextView = textViewHelper.getMainView();
+
                 textViewHelper.setOnCancelClick((a) -> {
                     layoutWhole.removeView(addTextView);
                     addPhoto.setVisibility(View.VISIBLE);
@@ -215,6 +233,7 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                 addPic.setVisibility(View.GONE);
                 addPencil.setVisibility(View.GONE);
                 addText.setVisibility(View.GONE);
+                break;
             case R.id.image_view_cancel:
                 DialogHelper.showAlertDialog(DrawFrontActivity.this, "提示", "确认不保存直接退出?",
                         ((dialog, which) -> {
@@ -224,12 +243,36 @@ public class DrawFrontActivity extends BaseActivity implements View.OnClickListe
                         }));
                 break;
             case R.id.image_view_done:
+                if (topView != null) {
+                    topView.setInEdit(false);
+                }
                 DialogHelper.showAlertDialog(DrawFrontActivity.this, "提示", "保存后的作品将不能再被返回修改",
                         ((dialog, which) -> {
-                            Bitmap bitmap = Bitmap.createBitmap(canvasLayout.getWidth(), canvasLayout.getHeight(), Bitmap.Config.ARGB_8888);
-                            Canvas canvas = new Canvas(bitmap);
-                            canvasLayout.draw(canvas);
-                            //TODO 上传图片
+                            File detailImageFile, previewImageFile;
+                            try {
+                                Bitmap bitmapDraw = Bitmap.createBitmap(canvasLayout.getWidth(), canvasLayout.getHeight(), Bitmap.Config.ARGB_8888);
+                                Canvas canvasDraw = new Canvas(bitmapDraw);
+                                canvasLayout.draw(canvasDraw);
+                                detailImageFile = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), System.currentTimeMillis() + ".png");
+                                bitmapDraw.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(detailImageFile));
+
+                                drawBackground.setDrawingCacheEnabled(true);
+                                Bitmap bitmapMain = drawBackground.getDrawingCache();
+                                Canvas canvasMain = new Canvas(bitmapMain);
+                                canvasMain.drawBitmap(bitmapDraw, canvasLayout.getLeft(), canvasLayout.getTop() - MyApplication.getScreenHeight() * 0.1f, null);
+                                previewImageFile = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), System.currentTimeMillis() + ".png");
+
+                                bitmapMain.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(previewImageFile));
+                                drawBackground.setDrawingCacheEnabled(false);
+
+                                Intent intent = new Intent(DrawFrontActivity.this, UploadDesignService.class)
+                                        .putExtra("detailImageUrl", detailImageFile.getAbsolutePath())
+                                        .putExtra("previewImageUrl", previewImageFile.getAbsolutePath());
+                                startService(intent);
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+
                         }), ((dialog, which) -> {
 
                         }));

@@ -59,7 +59,9 @@ public class PopupPencilWindowHelper implements View.OnClickListener, SeekBar.On
                 (int) (MyApplication.getScreenHeight() * 0.6), true);
         pencil_window.setOnDismissListener(onDismissListener);
         initPencilPopWinListener(winContentView);
-        currentPaintGraphics = PaintGraphics.DRAW_LINE;
+        if (pencilView.getCurrentPaintStatus() != PaintStatus.IN_SHAPE) {
+            currentPaintGraphics = PaintGraphics.DRAW_LINE;
+        }
         pencil_window.showAtLocation(parentView, Gravity.CENTER, 0, 0);
 
     }
@@ -101,11 +103,6 @@ public class PopupPencilWindowHelper implements View.OnClickListener, SeekBar.On
         seekBar1.setOnSeekBarChangeListener(this);
         seekBar2.setOnSeekBarChangeListener(this);
 
-        if (pencilView.getCurrentShapeStyle() == ShapeStyle.PAINT_FILL) {
-            radioGroupShape.check(R.id.fill_shape);
-        } else if (pencilView.getCurrentShapeStyle() == ShapeStyle.PAINT_STROKE) {
-            radioGroupShape.check(R.id.stroke_shape);
-        }
         radioGroupShape.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
@@ -121,6 +118,11 @@ public class PopupPencilWindowHelper implements View.OnClickListener, SeekBar.On
         });
 
         if (pencilView.getCurrentPaintStatus() == PaintStatus.IN_SHAPE) {
+            if (pencilView.getCurrentShapeStyle() == ShapeStyle.PAINT_FILL) {
+                radioGroupShape.check(R.id.fill_shape);
+            } else if (pencilView.getCurrentShapeStyle() == ShapeStyle.PAINT_STROKE) {
+                radioGroupShape.check(R.id.stroke_shape);
+            }
             radioGroupShape.setVisibility(View.VISIBLE);
             recyclerViewShape.setVisibility(View.VISIBLE);
             reset.setVisibility(View.INVISIBLE);

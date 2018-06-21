@@ -48,14 +48,19 @@
         <activity android:name=".ShopActivity" />
         <activity android:name=".WorldActivity" />
         <activity android:name=".SelfActivity" />
-        <activity android:name=".DrawEntranceActivity" />
-        <activity android:name=".DrawFrontActivity">
+        <activity android:name=".DrawEntranceActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".DrawFrontActivity"></activity>
+
+        <service
+            android:name=".service.UploadDesignService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

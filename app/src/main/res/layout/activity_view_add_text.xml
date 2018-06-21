@@ -27,7 +27,7 @@
         android:clickable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+        app:srcCompat="@drawable/ic_common_close_white_bounding" />
 
     <FrameLayout
         android:id="@+id/changeableBottomLayout"
